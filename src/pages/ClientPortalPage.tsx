@@ -3,6 +3,7 @@ import { INITIAL_CLIENT_CASES, FIRM_DETAILS } from '../data/legalData';
 import { ClientCase } from '../types';
 import { Search, Calendar, FileText, ExternalLink, Scale, CheckCircle2, AlertCircle, Clock, Share2, Plus, Download, BellRing, Database, User } from 'lucide-react';
 import { CourtCaseTrackerSection } from '../components/CourtCaseTrackerSection';
+import { getApiUrl } from '../config';
 
 export const ClientPortalPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,7 +31,7 @@ export const ClientPortalPage: React.FC = () => {
     setAllCases(localCasesList);
 
     // Fetch live cases from MongoDB Atlas API
-    fetch('/api/cases')
+    fetch(getApiUrl('/api/cases'))
       .then(r => r.json())
       .then(data => {
         if (data && data.success && Array.isArray(data.cases) && data.cases.length > 0) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { INITIAL_CLIENT_CASES, FIRM_DETAILS, OFFICE_LOCATIONS } from '../data/legalData';
 import { ClientCase, EnquiryItem, OfficeLocation, BlogPost, CaseStudy } from '../types';
+import { getApiUrl } from '../config';
 import {
   getStoredFirmDetails,
   saveFirmDetails,
@@ -119,7 +120,7 @@ export const AdvocatePortalPage: React.FC = () => {
   const handleSyncToMongoDB = async () => {
     setSyncingMongo(true);
     try {
-      const res = await fetch('/api/cases/sync-all', {
+      const res = await fetch(getApiUrl('/api/cases/sync-all'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cases })
@@ -200,7 +201,7 @@ export const AdvocatePortalPage: React.FC = () => {
   // Load state on mount
   useEffect(() => {
     // Check MongoDB API status
-    fetch('/api/mongodb/status')
+    fetch(getApiUrl('/api/mongodb/status'))
       .then(r => r.json())
       .then(data => {
         if (data && typeof data.connected === 'boolean') {
@@ -225,7 +226,7 @@ export const AdvocatePortalPage: React.FC = () => {
     setCases(localCases);
 
     // Fetch live cases from MongoDB Atlas if active
-    fetch('/api/cases')
+    fetch(getApiUrl('/api/cases'))
       .then(r => r.json())
       .then(data => {
         if (data && data.success && Array.isArray(data.cases) && data.cases.length > 0) {
@@ -236,7 +237,7 @@ export const AdvocatePortalPage: React.FC = () => {
       .catch(() => {});
 
     // Fetch Firm Profile from MongoDB Atlas
-    fetch('/api/firm-profile')
+    fetch(getApiUrl('/api/firm-profile'))
       .then(r => r.json())
       .then(data => {
         if (data && data.success && data.profile) {
@@ -297,7 +298,7 @@ export const AdvocatePortalPage: React.FC = () => {
 
     // Auto-sync to MongoDB Atlas cloud database
     try {
-      const res = await fetch('/api/cases/sync-all', {
+      const res = await fetch(getApiUrl('/api/cases/sync-all'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cases: updated })
@@ -432,7 +433,7 @@ export const AdvocatePortalPage: React.FC = () => {
     saveFirmDetails(firmProfile);
 
     try {
-      await fetch('/api/firm-profile', {
+      await fetch(getApiUrl('/api/firm-profile'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(firmProfile)

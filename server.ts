@@ -32,6 +32,17 @@ async function startServer() {
   // Body parser with 10mb limit for PDF order copies & profile photos
   app.use(express.json({ limit: "10mb" }));
 
+  // CORS middleware for Render / external frontend calls
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
   // API Routes
   app.get("/api/health", (_req, res) => {
     res.json({
