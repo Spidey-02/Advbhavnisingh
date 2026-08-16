@@ -1,0 +1,18 @@
+type: web
+name: bhavani-singh-associates
+env: node
+region: singapore
+plan: free
+buildCommand: npm install && npm run build
+startCommand: npm start
+envVars:
+  - key: NODE_VERSION
+    value: 20.18.0
+  - key: NPM_CONFIG_PRODUCTION
+    value: "false"
+  - key: MONGODB_DB_NAME
+    value: "bhavani_law_firm"
+  - key: MONGODB_URI
+    sync: false
+  - key: GEMINI_API_KEY
+    sync: false
