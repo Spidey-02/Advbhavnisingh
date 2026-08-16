@@ -1,0 +1,6 @@
+{
+  "name": "Bhavani Singh & Associates - Advocates & Legal Consultants",
+  "description": "Official website & legal management portal for Bhavani Singh & Associates Advocates, High Court of Judicature at Allahabad & Supreme Court of India. Featuring two-way client case tracking, Allahabad High Court order sheet query links, calendar reminders, and advocate management portal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
