@@ -112,7 +112,7 @@ export const CourtCaseTrackerSection: React.FC = () => {
         <Scale className="w-96 h-96 text-[#c5a059]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8 relative z-10">
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16 space-y-8 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">

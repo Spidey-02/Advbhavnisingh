@@ -20,7 +20,7 @@ export const ExpertiseSection: React.FC<ExpertiseSectionProps> = ({
 
   return (
     <section className="py-16 sm:py-24 bg-white border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
         
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-10">
@@ -62,7 +62,7 @@ export const ExpertiseSection: React.FC<ExpertiseSectionProps> = ({
           {filteredAreas.map((area) => (
             <div
               key={area.id}
-              className="group bg-white overflow-hidden border border-slate-200 hover:border-[#c5a059] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+              className="group bg-white overflow-hidden border border-slate-200 hover:border-[#c5a059] shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 {/* Card Image with Circular Icon Badge */}

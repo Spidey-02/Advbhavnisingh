@@ -31,48 +31,131 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
-    <!-- Google LegalService Schema Markup (JSON-LD) for Search Indexing -->
+    <!-- Google LegalService, WebSite & FAQ Schema Markup (JSON-LD) for Search Indexing -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LegalService",
-      "name": "Bhavni Singh & Associates",
-      "alternateName": "Bhavni Singh Advocates & Legal Consultants",
-      "description": "Premier Indian law firm led by Advocate Bhavni Singh practicing before the Hon'ble High Court of Judicature at Allahabad, District & Sessions Court Prayagraj, and Board of Revenue.",
-      "url": "https://bhavnisinghassociates.com",
-      "telephone": "+919415211990",
-      "email": "chambers.bhavnisingh@gmail.com",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "High Court Gate No. 3 Main Bench, Civil Lines",
-        "addressLocality": "Prayagraj",
-        "addressRegion": "Uttar Pradesh",
-        "postalCode": "211001",
-        "addressCountry": "IN"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 25.4522,
-        "longitude": 81.8347
-      },
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday"
-        ],
-        "opens": "09:30",
-        "closes": "20:00"
-      },
-      "priceRange": "₹₹",
-      "founder": {
-        "@type": "Person",
-        "name": "Advocate Bhavni Singh"
-      }
+      "@graph": [
+        {
+          "@type": "LegalService",
+          "@id": "https://bhavnisinghassociates.com/#legalservice",
+          "name": "Bhavni Singh & Associates",
+          "alternateName": ["Bhavni Singh Advocates", "Bhavni Singh Legal Consultants Prayagraj"],
+          "description": "Premier Indian law firm led by Advocate Bhavni Singh practicing before the Hon'ble High Court of Judicature at Allahabad, District & Sessions Court Prayagraj, and Board of Revenue.",
+          "url": "https://bhavnisinghassociates.com",
+          "telephone": "+919415211990",
+          "email": "chambers.bhavnisingh@gmail.com",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "High Court Gate No. 3 Main Bench, Civil Lines",
+            "addressLocality": "Prayagraj",
+            "addressRegion": "Uttar Pradesh",
+            "postalCode": "211001",
+            "addressCountry": "IN"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 25.4522,
+            "longitude": 81.8347
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ],
+            "opens": "09:30",
+            "closes": "20:00"
+          },
+          "priceRange": "₹₹",
+          "founder": {
+            "@type": "Person",
+            "name": "Advocate Bhavni Singh",
+            "jobTitle": "Senior Advocate & Founder",
+            "worksFor": "Allahabad High Court Bar Association"
+          },
+          "areaServed": ["Prayagraj", "Allahabad", "Lucknow", "Uttar Pradesh", "India"],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "High Court Legal Representation Services",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Criminal Bail & Anticipatory Bail Petitions"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "High Court Writ Petitions (Article 226/227)"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Revenue & Land Litigation"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Service & Employment Writs"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://bhavnisinghassociates.com/#website",
+          "url": "https://bhavnisinghassociates.com",
+          "name": "Bhavni Singh & Associates",
+          "description": "High Court Advocates, Legal Consultants & Client Case Status Portal",
+          "publisher": {
+            "@id": "https://bhavnisinghassociates.com/#legalservice"
+          },
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://bhavnisinghassociates.com/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How can I check my Allahabad High Court case status?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can check your case status online by visiting the Bhavni Singh & Associates Client Portal using your filing number or client phone number to view hearing dates, bench details, and certified order sheets."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Where is Advocate Bhavni Singh's chamber located?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Advocate Bhavni Singh's main chamber is located near High Court Gate No. 3 Main Bench, Civil Lines, Prayagraj (Allahabad), Uttar Pradesh 211001."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How can I book a legal consultation with Advocate Bhavni Singh?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can book a legal consultation by calling +91 9415211990, connecting via WhatsApp, or filling out the appointment request form on our official website."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
   </head>

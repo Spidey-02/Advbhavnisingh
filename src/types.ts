@@ -90,6 +90,15 @@ export interface OfficeLocation {
   gmapEmbedUrl?: string;
 }
 
+export interface HeroSlide {
+  id: string;
+  slideNumber: 1 | 2 | 3 | 4;
+  title: string;
+  subtitle: string;
+  tag: string;
+  image: string;
+}
+
 export interface ClientCase {
   id?: string;
   caseNumber: string;
@@ -130,5 +139,20 @@ export interface EnquiryItem {
   query: string;
   date: string;
   status: 'New' | 'Contacted' | 'In Progress' | 'Archived';
+}
+
+export interface ClientProfile {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  city?: string;
+  address?: string;
+  caseType?: string;
+  caseNumbers?: string[];
+  totalCases?: number;
+  notes?: string;
+  status?: 'Active' | 'Consultation' | 'Archived';
+  createdAt: string;
 }
 

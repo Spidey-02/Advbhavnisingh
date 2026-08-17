@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { INITIAL_CLIENT_CASES, FIRM_DETAILS, OFFICE_LOCATIONS } from '../data/legalData';
-import { ClientCase, EnquiryItem, OfficeLocation, BlogPost, CaseStudy } from '../types';
+import { ClientCase, EnquiryItem, OfficeLocation, BlogPost, CaseStudy, HeroSlide, ClientProfile } from '../types';
 import { getApiUrl } from '../config';
+import { formatDateToDDMMYYYY, getTodayDDMMYYYY } from '../utils/dateFormatter';
 import {
   getStoredFirmDetails,
   saveFirmDetails,
@@ -11,13 +12,17 @@ import {
   saveBlogs,
   getStoredCaseStudies,
   saveCaseStudies,
+  getStoredHeroSlides,
+  saveHeroSlides,
+  getStoredClients,
+  saveClients,
   FirmDetailsType
 } from '../data/firmStore';
 import {
   Scale, Users, Calendar, Plus, Edit2, CheckCircle2, MapPin, Search, Trash2,
   ExternalLink, Save, Phone, Mail, Clock, Eye, Upload, Download, FileText,
   MessageSquare, BookOpen, User, Settings, Navigation, X, Sparkles, QrCode,
-  Lock, LogOut, Key, HelpCircle, Database, RefreshCw, Camera, Check
+  Lock, LogOut, Key, HelpCircle, Database, RefreshCw, Camera, Check, MessageCircle, UserCheck
 } from 'lucide-react';
 
 export const AdvocatePortalPage: React.FC = () => {
@@ -38,14 +43,58 @@ export const AdvocatePortalPage: React.FC = () => {
   const [syncingMongo, setSyncingMongo] = useState(false);
 
   const [cases, setCases] = useState<ClientCase[]>([]);
+  const [clientsList, setClientsList] = useState<ClientProfile[]>(getStoredClients());
   const [enquiries, setEnquiries] = useState<EnquiryItem[]>([]);
   const [firmProfile, setFirmProfile] = useState<FirmDetailsType>(getStoredFirmDetails());
   const [locationsList, setLocationsList] = useState<OfficeLocation[]>(getStoredOfficeLocations());
   const [blogsList, setBlogsList] = useState<BlogPost[]>(getStoredBlogs());
   const [caseStudiesList, setCaseStudiesList] = useState<CaseStudy[]>(getStoredCaseStudies());
+  const [heroSlidesList, setHeroSlidesList] = useState<HeroSlide[]>(getStoredHeroSlides());
+
+  // Location form state
+  const [newLoc, setNewLoc] = useState<Omit<OfficeLocation, 'id'>>({
+    name: '',
+    type: 'High Court Chamber',
+    address: '',
+    landmark: '',
+    phone: '+91 9415211990',
+    email: 'advprakhargupta.211@gmail.com',
+    hours: 'Mon – Sat: 9:00 AM – 8:00 PM',
+    mapEmbedUrl: ''
+  });
+
+  // Blog form state
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    category: 'High Court Writs',
+    author: 'Advocate Bhavni Singh',
+    authorRole: 'Senior Advocate — Allahabad High Court',
+    readTime: '5 min read',
+    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+    excerpt: '',
+    fullArticle: '',
+    tags: 'High Court, Legal Update'
+  });
+
+  // Case Study form state
+  const [newCaseStudy, setNewCaseStudy] = useState({
+    title: '',
+    practiceArea: 'High Court Writ Petition',
+    court: 'Allahabad High Court (Prayagraj)',
+    year: '2026',
+    summary: '',
+    challenge: '',
+    strategy: '',
+    verdictOutcome: 'Writ Petition Allowed',
+    category: 'writ',
+    clientAnonymized: 'Confidential Litigant'
+  });
+
+  const [caseSearchQuery, setCaseSearchQuery] = useState('');
+  const [clientSearchQuery, setClientSearchQuery] = useState('');
 
   const [activeTab, setActiveTab] = useState<
-    'cases' | 'enquiries' | 'addCase' | 'profile' | 'locations' | 'blogs' | 'caseStudies'
+    'cases' | 'clients' | 'enquiries' | 'addCase' | 'profile' | 'heroSlides' | 'locations' | 'blogs' | 'caseStudies'
   >('cases');
 
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -149,11 +198,13 @@ export const AdvocatePortalPage: React.FC = () => {
     opposingParty: 'State of U.P. & Others',
     caseType: 'Writ Petition (Article 226/227)',
     courtName: 'Allahabad High Court (Prayagraj Main Bench)',
-    nextHearingDate: '18 Sep 2026',
+    nextHearingDate: '18/09/2026',
     judgeBench: 'Hon\'ble Justice Rameshwar Nath & Justice A.K. Roy',
     courtRoomNo: 'Court No. 34',
     status: 'Pending Hearing',
     stage: 'Counter Affidavit Filed / For Final Arguments',
+    filingDate: getTodayDDMMYYYY(),
+    advocateAssigned: 'Advocate Bhavni Singh',
     lastOrderRemarks: 'Court directed State counsel to produce original revenue records on next date.',
     highCourtOrderUrl: FIRM_DETAILS.highCourtOfficialPortal
   });
@@ -161,42 +212,105 @@ export const AdvocatePortalPage: React.FC = () => {
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<ClientCase>>({});
 
-  // States for adding location, blog, case study
-  const [newLoc, setNewLoc] = useState({
-    name: 'District & Sessions Court Chamber',
-    type: 'District Chamber',
-    address: 'Chamber No. 12, Lawyers Block, District Court Compound, Varanasi, UP - 221001',
-    landmark: 'Near Kutchery Gate No. 2',
-    phone: firmProfile.phone,
-    email: firmProfile.email,
-    hours: 'Mon - Sat: 10:00 AM - 5:00 PM',
-    mapEmbedUrl: `https://maps.google.com/?q=Varanasi+District+Court`
+  // Client Directory Management States
+  const [editingClientId, setEditingClientId] = useState<string | null>(null);
+  const [editClientData, setEditClientData] = useState<Partial<ClientProfile>>({});
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [newClient, setNewClient] = useState<Omit<ClientProfile, 'id' | 'createdAt'>>({
+    name: '',
+    phone: '',
+    email: '',
+    city: 'Prayagraj, UP',
+    address: '',
+    caseType: 'High Court Writ Petition',
+    caseNumbers: [],
+    totalCases: 1,
+    notes: '',
+    status: 'Active'
   });
 
-  const [newBlog, setNewBlog] = useState({
-    title: '',
-    category: 'High Court Writs',
-    author: 'Advocate Bhavni Singh',
-    authorRole: 'Senior Advocate — Allahabad High Court',
-    readTime: '5 min read',
-    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
-    excerpt: '',
-    fullArticle: '',
-    tags: 'High Court, Writs, Legal Tips'
-  });
+  // Location editing state
+  const [editingLocId, setEditingLocId] = useState<string | null>(null);
+  const [editLocData, setEditLocData] = useState<Partial<OfficeLocation>>({});
 
-  const [newCaseStudy, setNewCaseStudy] = useState({
-    title: '',
-    practiceArea: 'High Court Writ Petition',
-    court: 'Allahabad High Court (Prayagraj)',
-    year: '2026',
-    summary: '',
-    challenge: '',
-    strategy: '',
-    verdictOutcome: 'Writ Petition Allowed with Landmark Directions',
-    category: 'writ' as const,
-    clientAnonymized: 'Confidential Litigant'
-  });
+  const handleUpdateLocation = (id: string) => {
+    const updated = locationsList.map(l => l.id === id ? { ...l, ...editLocData } as OfficeLocation : l);
+    setLocationsList(updated);
+    saveOfficeLocations(updated);
+    setEditingLocId(null);
+    triggerToast('Chamber location & Google Maps link updated!');
+  };
+
+  // Helper to ensure all cases have safe IDs and essential fields
+  const sanitizeCases = (rawList: ClientCase[]): ClientCase[] => {
+    return rawList.map((c, idx) => ({
+      ...c,
+      id: c.id && c.id.trim() !== '' ? c.id : `case-${Date.now()}-${idx + 1}`,
+      filingDate: formatDateToDDMMYYYY(c.filingDate || '10/01/2026'),
+      nextHearingDate: formatDateToDDMMYYYY(c.nextHearingDate || '18/09/2026'),
+      stage: c.stage || c.currentStage || 'Pending Hearing',
+      currentStage: c.currentStage || c.stage || 'Pending Hearing',
+      advocateAssigned: c.advocateAssigned || c.assignedAdvocate || 'Advocate Bhavni Singh',
+      assignedAdvocate: c.assignedAdvocate || c.advocateAssigned || 'Advocate Bhavni Singh'
+    }));
+  };
+
+  // Synchronize client directory automatically whenever cases change
+  const syncClientDirectory = (
+    clientName: string,
+    phone: string,
+    caseNo?: string,
+    caseType?: string,
+    city?: string,
+    notes?: string
+  ) => {
+    if (!clientName || !clientName.trim()) return;
+    const cleanPhone = phone ? phone.trim() : '';
+    const cleanName = clientName.trim();
+
+    setClientsList(prevClients => {
+      const existingIdx = prevClients.findIndex(cl =>
+        (cleanPhone && cl.phone && cl.phone.replace(/\D/g, '') === cleanPhone.replace(/\D/g, '')) ||
+        cl.name.toLowerCase() === cleanName.toLowerCase()
+      );
+
+      let updatedList = [...prevClients];
+      if (existingIdx >= 0) {
+        const existing = updatedList[existingIdx];
+        const existingCases = existing.caseNumbers || [];
+        const newCases = caseNo && !existingCases.includes(caseNo) ? [...existingCases, caseNo] : existingCases;
+        updatedList[existingIdx] = {
+          ...existing,
+          name: cleanName,
+          phone: cleanPhone || existing.phone,
+          caseType: caseType || existing.caseType,
+          caseNumbers: newCases,
+          totalCases: newCases.length,
+          city: city || existing.city || 'Prayagraj, UP',
+          notes: notes !== undefined ? notes : existing.notes
+        };
+      } else {
+        const newProfile: ClientProfile = {
+          id: `client-${Date.now()}`,
+          name: cleanName,
+          phone: cleanPhone || '+91 9415211990',
+          email: '',
+          city: city || 'Prayagraj, UP',
+          address: '',
+          caseType: caseType || 'High Court Matter',
+          caseNumbers: caseNo ? [caseNo] : [],
+          totalCases: caseNo ? 1 : 0,
+          notes: notes || 'Registered via Case Management File',
+          status: 'Active',
+          createdAt: getTodayDDMMYYYY()
+        };
+        updatedList = [newProfile, ...updatedList];
+      }
+
+      saveClients(updatedList);
+      return updatedList;
+    });
+  };
 
   // Load state on mount
   useEffect(() => {
@@ -223,15 +337,17 @@ export const AdvocatePortalPage: React.FC = () => {
         console.error(e);
       }
     }
-    setCases(localCases);
+    const sanitized = sanitizeCases(localCases);
+    setCases(sanitized);
 
     // Fetch live cases from MongoDB Atlas if active
     fetch(getApiUrl('/api/cases'))
       .then(r => r.json())
       .then(data => {
         if (data && data.success && Array.isArray(data.cases) && data.cases.length > 0) {
-          setCases(data.cases);
-          localStorage.setItem('bhavani_cases', JSON.stringify(data.cases));
+          const apiSanitized = sanitizeCases(data.cases);
+          setCases(apiSanitized);
+          localStorage.setItem('bhavani_cases', JSON.stringify(apiSanitized));
         }
       })
       .catch(() => {});
@@ -261,24 +377,20 @@ export const AdvocatePortalPage: React.FC = () => {
       setEnquiries([
         {
           id: 'ENQ-901',
-          clientName: 'Suresh Chandra Yadav',
+          name: 'Suresh Chandra Yadav',
           phone: '+91 9839120091',
           email: 'suresh.yadav@gmail.com',
-          caseType: 'Land Revenue Dispute (UP Revenue Code)',
-          courtName: 'Allahabad High Court (Prayagraj)',
-          message: 'Wants to file Writ Petition challenging SDM land eviction order in District Jaunpur.',
-          submittedAt: '06 Aug 2026',
+          query: 'Wants to file Writ Petition challenging SDM land eviction order in District Jaunpur.',
+          date: '06 Aug 2026',
           status: 'New'
         },
         {
           id: 'ENQ-902',
-          clientName: 'Anil Gupta',
+          name: 'Anil Gupta',
           phone: '+91 9415099812',
           email: 'anilgupta.vns@gmail.com',
-          caseType: 'High Court Bail Application',
-          courtName: 'Allahabad High Court (Prayagraj)',
-          message: 'Bail application in FIR No. 341/2026 under IPC 420/467/468 at Varanasi.',
-          submittedAt: '05 Aug 2026',
+          query: 'Bail application in FIR No. 341/2026 under IPC 420/467/468 at Varanasi.',
+          date: '05 Aug 2026',
           status: 'Contacted'
         }
       ]);
@@ -293,24 +405,84 @@ export const AdvocatePortalPage: React.FC = () => {
 
   // Save cases with AUTO-SYNC to MongoDB Atlas
   const saveCasesToStorage = async (updated: ClientCase[]) => {
-    setCases(updated);
-    localStorage.setItem('bhavani_cases', JSON.stringify(updated));
+    const sanitized = sanitizeCases(updated);
+    setCases(sanitized);
+    localStorage.setItem('bhavani_cases', JSON.stringify(sanitized));
 
     // Auto-sync to MongoDB Atlas cloud database
     try {
       const res = await fetch(getApiUrl('/api/cases/sync-all'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cases: updated })
+        body: JSON.stringify({ cases: sanitized })
       });
       const data = await res.json();
       if (data.success) {
         triggerToast('Case record updated & auto-synced to MongoDB Atlas cloud database!');
       } else {
-        triggerToast('Case record updated & saved locally across portals!');
+        triggerToast('Case record updated & saved in browser storage!');
       }
     } catch (err) {
-      triggerToast('Case record updated & saved locally across portals!');
+      triggerToast('Case record updated & saved across portals!');
+    }
+  };
+
+  // Client Management Handlers
+  const handleCreateClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    const created: ClientProfile = {
+      id: `client-${Date.now()}`,
+      name: newClient.name,
+      phone: newClient.phone,
+      email: newClient.email,
+      city: newClient.city || 'Prayagraj, UP',
+      address: newClient.address || '',
+      caseType: newClient.caseType || 'High Court Matter',
+      caseNumbers: newClient.caseNumbers || [],
+      totalCases: newClient.caseNumbers?.length || 0,
+      notes: newClient.notes || '',
+      status: newClient.status || 'Active',
+      createdAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    };
+
+    const updated = [created, ...clientsList];
+    setClientsList(updated);
+    saveClients(updated);
+    setShowAddClientModal(false);
+    setNewClient({
+      name: '',
+      phone: '',
+      email: '',
+      city: 'Prayagraj, UP',
+      address: '',
+      caseType: 'High Court Writ Petition',
+      caseNumbers: [],
+      totalCases: 1,
+      notes: '',
+      status: 'Active'
+    });
+    triggerToast('New client added to Client Directory successfully!');
+  };
+
+  const startEditClient = (cl: ClientProfile) => {
+    setEditingClientId(cl.id);
+    setEditClientData(cl);
+  };
+
+  const handleUpdateClient = (id: string) => {
+    const updated = clientsList.map(cl => cl.id === id ? { ...cl, ...editClientData } as ClientProfile : cl);
+    setClientsList(updated);
+    saveClients(updated);
+    setEditingClientId(null);
+    triggerToast('Client details updated in directory!');
+  };
+
+  const handleDeleteClient = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this client from the directory?')) {
+      const updated = clientsList.filter(cl => cl.id !== id);
+      setClientsList(updated);
+      saveClients(updated);
+      triggerToast('Client record removed from directory.');
     }
   };
 
@@ -342,7 +514,7 @@ export const AdvocatePortalPage: React.FC = () => {
       const dataUrl = uploadEvent.target?.result as string;
       const newDoc = {
         title: file.name,
-        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        date: getTodayDDMMYYYY(),
         size: `${(file.size / 1024).toFixed(1)} KB`,
         type: 'Court Order / Judgment PDF',
         url: dataUrl
@@ -374,27 +546,35 @@ export const AdvocatePortalPage: React.FC = () => {
   // Create Case
   const handleCreateCase = (e: React.FormEvent) => {
     e.preventDefault();
+    const caseId = `case-${Date.now()}`;
+    const filingDateVal = formatDateToDDMMYYYY(newCase.filingDate || getTodayDDMMYYYY());
+    const nextHearingDateVal = formatDateToDDMMYYYY(newCase.nextHearingDate || '18/09/2026');
+    const stageVal = newCase.stage || 'Counter Affidavit Filed / For Final Arguments';
+    const advocateVal = newCase.advocateAssigned || firmProfile.founderName || 'Advocate Bhavni Singh';
+
     const created: ClientCase = {
-      id: 'case-' + Date.now().toString(),
+      id: caseId,
       caseNumber: newCase.caseNumber,
       clientName: newCase.clientName,
       phone: newCase.phone,
       opposingParty: newCase.opposingParty,
       caseType: newCase.caseType,
       courtName: newCase.courtName,
-      nextHearingDate: newCase.nextHearingDate,
+      nextHearingDate: nextHearingDateVal,
       judgeBench: newCase.judgeBench,
       courtRoomNo: newCase.courtRoomNo,
       status: newCase.status,
-      stage: newCase.stage,
-      filingDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      advocateAssigned: firmProfile.founderName || 'Advocate Bhavni Singh',
+      stage: stageVal,
+      currentStage: stageVal,
+      filingDate: filingDateVal,
+      advocateAssigned: advocateVal,
+      assignedAdvocate: advocateVal,
       lastOrderRemarks: newCase.lastOrderRemarks,
       highCourtOrderUrl: newCaseOrderFile ? newCaseOrderFile.url : newCase.highCourtOrderUrl,
       documents: newCaseOrderFile ? [
         {
           title: newCaseOrderFile.name,
-          date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+          date: filingDateVal,
           size: '1.2 MB',
           type: 'Court Order / Judgment PDF',
           url: newCaseOrderFile.url
@@ -404,26 +584,85 @@ export const AdvocatePortalPage: React.FC = () => {
 
     const updated = [created, ...cases];
     saveCasesToStorage(updated);
+
+    // Auto sync client to Client Directory
+    syncClientDirectory(newCase.clientName, newCase.phone, newCase.caseNumber, newCase.caseType);
+
     setNewCaseOrderFile(null);
+    setNewCase({
+      caseNumber: '',
+      clientName: '',
+      phone: '',
+      opposingParty: 'State of U.P. & Others',
+      caseType: 'Writ Petition (Article 226/227)',
+      courtName: 'Allahabad High Court (Prayagraj Main Bench)',
+      nextHearingDate: '18/09/2026',
+      judgeBench: 'Hon\'ble Justice Rameshwar Nath & Justice A.K. Roy',
+      courtRoomNo: 'Court No. 34',
+      status: 'Pending Hearing',
+      stage: 'Counter Affidavit Filed / For Final Arguments',
+      filingDate: getTodayDDMMYYYY(),
+      advocateAssigned: 'Advocate Bhavni Singh',
+      lastOrderRemarks: 'Court directed State counsel to produce original revenue records on next date.',
+      highCourtOrderUrl: FIRM_DETAILS.highCourtOfficialPortal
+    });
     setActiveTab('cases');
+    triggerToast('New case added and client directory synced successfully!');
   };
 
   // Edit Case
   const startEditCase = (c: ClientCase) => {
-    setEditingCaseId(c.id || '');
-    setEditFormData(c);
+    const safeId = c.id || c.caseNumber || `case-${Date.now()}`;
+    setEditingCaseId(safeId);
+    setEditFormData({
+      ...c,
+      id: safeId,
+      stage: c.stage || c.currentStage || 'Pending Hearing',
+      currentStage: c.currentStage || c.stage || 'Pending Hearing',
+      filingDate: formatDateToDDMMYYYY(c.filingDate || '10/01/2026'),
+      nextHearingDate: formatDateToDDMMYYYY(c.nextHearingDate || '18/09/2026'),
+      advocateAssigned: c.advocateAssigned || c.assignedAdvocate || firmProfile.founderName || 'Advocate Bhavni Singh',
+      assignedAdvocate: c.assignedAdvocate || c.advocateAssigned || firmProfile.founderName || 'Advocate Bhavni Singh'
+    });
   };
 
   const handleUpdateCase = (id: string) => {
-    const updated = cases.map(c => c.id === id ? { ...c, ...editFormData } : c);
+    const updated = cases.map(c => {
+      if (c.id === id || c.caseNumber === id || editingCaseId === c.id || editingCaseId === c.caseNumber) {
+        return {
+          ...c,
+          ...editFormData,
+          filingDate: formatDateToDDMMYYYY(editFormData.filingDate || c.filingDate || getTodayDDMMYYYY()),
+          nextHearingDate: formatDateToDDMMYYYY(editFormData.nextHearingDate || c.nextHearingDate || '18/09/2026'),
+          stage: editFormData.stage || editFormData.currentStage || c.stage,
+          currentStage: editFormData.stage || editFormData.currentStage || c.currentStage,
+          advocateAssigned: editFormData.advocateAssigned || editFormData.assignedAdvocate || c.advocateAssigned || 'Advocate Bhavni Singh',
+          assignedAdvocate: editFormData.advocateAssigned || editFormData.assignedAdvocate || c.assignedAdvocate || 'Advocate Bhavni Singh'
+        } as ClientCase;
+      }
+      return c;
+    });
+
     saveCasesToStorage(updated);
     setEditingCaseId(null);
+    triggerToast('Case details and court remarks saved successfully!');
+
+    // Also update client in client directory
+    if (editFormData.clientName) {
+      syncClientDirectory(
+        editFormData.clientName,
+        editFormData.phone || '',
+        editFormData.caseNumber,
+        editFormData.caseType
+      );
+    }
   };
 
   const handleDeleteCase = (id: string) => {
     if (window.confirm('Are you sure you want to remove this case record?')) {
-      const updated = cases.filter(c => c.id !== id);
+      const updated = cases.filter(c => c.id !== id && c.caseNumber !== id);
       saveCasesToStorage(updated);
+      triggerToast('Case record removed.');
     }
   };
 
@@ -484,7 +723,7 @@ export const AdvocatePortalPage: React.FC = () => {
       category: newBlog.category,
       author: newBlog.author,
       authorRole: newBlog.authorRole,
-      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+      date: getTodayDDMMYYYY(),
       readTime: newBlog.readTime,
       imageUrl: newBlog.imageUrl,
       excerpt: newBlog.excerpt,
@@ -559,6 +798,38 @@ export const AdvocatePortalPage: React.FC = () => {
       saveCaseStudies(updated);
       triggerToast('Case study removed.');
     }
+  };
+
+  // Hero Slider Handlers
+  const handleUpdateSlideField = (index: number, field: keyof HeroSlide, value: string) => {
+    const updated = [...heroSlidesList];
+    updated[index] = { ...updated[index], [field]: value };
+    setHeroSlidesList(updated);
+  };
+
+  const handleSlideImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 8 * 1024 * 1024) {
+        alert('Image file size must be less than 8MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        const result = uploadEvent.target?.result as string;
+        if (result) {
+          handleUpdateSlideField(index, 'image', result);
+          triggerSaveNotice(`Slide ${index + 1} photo uploaded! Save Hero Slider Configuration to publish.`);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveAllHeroSlides = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveHeroSlides(heroSlidesList);
+    triggerSaveNotice('All 4 Hero Slider images & titles updated live!');
   };
 
   const getAdvocateCalendarUrl = (c: ClientCase) => {
@@ -735,9 +1006,9 @@ export const AdvocatePortalPage: React.FC = () => {
         </div>
 
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="bg-white p-4 sm:p-5 border border-slate-200 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Active Cases</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Cases</span>
             <div className="flex items-center justify-between mt-2">
               <span className="text-3xl font-serif text-[#1e293b]">{cases.length}</span>
               <Scale className="w-6 h-6 text-[#c5a059]" />
@@ -745,7 +1016,15 @@ export const AdvocatePortalPage: React.FC = () => {
           </div>
 
           <div className="bg-white p-4 sm:p-5 border border-slate-200 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Client Enquiries</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Client Directory</span>
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-3xl font-serif text-[#1e293b]">{clientsList.length}</span>
+              <Users className="w-6 h-6 text-[#c5a059]" />
+            </div>
+          </div>
+
+          <div className="bg-white p-4 sm:p-5 border border-slate-200 shadow-sm">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Client Queries</span>
             <div className="flex items-center justify-between mt-2">
               <span className="text-3xl font-serif text-[#1e293b]">{enquiries.length}</span>
               <Mail className="w-6 h-6 text-[#c5a059]" />
@@ -753,7 +1032,7 @@ export const AdvocatePortalPage: React.FC = () => {
           </div>
 
           <div className="bg-white p-4 sm:p-5 border border-slate-200 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Legal Articles / News</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Legal Articles</span>
             <div className="flex items-center justify-between mt-2">
               <span className="text-3xl font-serif text-[#1e293b]">{blogsList.length}</span>
               <BookOpen className="w-6 h-6 text-[#c5a059]" />
@@ -761,7 +1040,7 @@ export const AdvocatePortalPage: React.FC = () => {
           </div>
 
           <div className="bg-white p-4 sm:p-5 border border-slate-200 shadow-sm">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Chamber Locations</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Chambers</span>
             <div className="flex items-center justify-between mt-2">
               <span className="text-3xl font-serif text-[#1e293b]">{locationsList.length}</span>
               <MapPin className="w-6 h-6 text-[#c5a059]" />
@@ -782,10 +1061,19 @@ export const AdvocatePortalPage: React.FC = () => {
           <button
             onClick={() => setActiveTab('cases')}
             className={`px-5 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer shrink-0 ${
-              activeTab === 'cases' ? 'border-[#c5a059] text-[#1e293b] bg-slate-50' : 'border-transparent text-slate-500 hover:text-slate-800'
+              activeTab === 'cases' ? 'border-[#c5a059] text-[#1e293b] bg-slate-50 font-extrabold' : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             Cases &amp; Orders ({cases.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('clients')}
+            className={`px-5 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer shrink-0 ${
+              activeTab === 'clients' ? 'border-[#c5a059] text-[#1e293b] bg-slate-50 font-extrabold' : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            Client Directory ({clientsList.length})
           </button>
 
           <button
@@ -795,6 +1083,15 @@ export const AdvocatePortalPage: React.FC = () => {
             }`}
           >
             Profile &amp; Contact Info
+          </button>
+
+          <button
+            onClick={() => setActiveTab('heroSlides')}
+            className={`px-5 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer shrink-0 ${
+              activeTab === 'heroSlides' ? 'border-[#c5a059] text-[#1e293b] bg-slate-50 font-extrabold' : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            Hero Slider (4 Photos)
           </button>
 
           <button
@@ -847,105 +1144,203 @@ export const AdvocatePortalPage: React.FC = () => {
         {activeTab === 'cases' && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 border border-slate-200">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                Registered Client Cases with Attached Court Orders:
-              </span>
-              <button
-                onClick={() => setActiveTab('addCase')}
-                className="px-4 py-2 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#c5a059]" />
-                <span>Add New Case</span>
-              </button>
+              <div className="flex-1 w-full sm:max-w-md relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search cases by Case No, Client Name, Mobile, Opposing Party..."
+                  value={caseSearchQuery}
+                  onChange={(e) => setCaseSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:border-[#c5a059]"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  onClick={() => setActiveTab('addCase')}
+                  className="px-4 py-2 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5 text-[#c5a059]" />
+                  <span>Add New Case</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4">
-              {cases.map((c, idx) => (
+              {cases
+                .filter(c => {
+                  if (!caseSearchQuery.trim()) return true;
+                  const q = caseSearchQuery.toLowerCase();
+                  return (
+                    (c.caseNumber && c.caseNumber.toLowerCase().includes(q)) ||
+                    (c.clientName && c.clientName.toLowerCase().includes(q)) ||
+                    (c.phone && c.phone.includes(q)) ||
+                    (c.opposingParty && c.opposingParty.toLowerCase().includes(q)) ||
+                    (c.courtName && c.courtName.toLowerCase().includes(q))
+                  );
+                })
+                .map((c, idx) => (
                 <div key={`adv-case-${c.id || c.caseNumber || 'item'}-${idx}`} className="bg-white border border-slate-200 p-6 shadow-sm space-y-4">
-                  {editingCaseId === c.id ? (
+                  {editingCaseId === (c.id || c.caseNumber) ? (
                     /* Edit Mode Form */
                     <div className="space-y-4 text-xs">
                       <div className="flex justify-between items-center border-b pb-2">
-                        <h3 className="font-serif font-bold text-base text-[#1e293b]">Editing Case: {c.caseNumber}</h3>
+                        <div>
+                          <span className="text-[10px] font-bold text-[#c5a059] uppercase tracking-wider">Advocate Case File Editor</span>
+                          <h3 className="font-serif font-bold text-base text-[#1e293b]">Editing Case: {c.caseNumber}</h3>
+                        </div>
                         <button
+                          type="button"
                           onClick={() => setEditingCaseId(null)}
-                          className="text-slate-400 hover:text-slate-700 font-bold"
+                          className="text-slate-500 hover:text-slate-800 font-bold text-xs underline cursor-pointer"
                         >
-                          Cancel Edit
+                          Cancel
                         </button>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                          <label className="font-bold text-slate-600">Case Number:</label>
+                          <label className="font-bold text-slate-700 block mb-1">Case Filing Number *</label>
                           <input
                             type="text"
+                            required
                             value={editFormData.caseNumber || ''}
                             onChange={(e) => setEditFormData({ ...editFormData, caseNumber: e.target.value })}
-                            className="w-full p-2 bg-slate-50 border mt-1"
+                            className="w-full p-2 bg-slate-50 border border-slate-300 font-bold"
                           />
                         </div>
 
                         <div>
-                          <label className="font-bold text-slate-600">Client Name:</label>
+                          <label className="font-bold text-slate-700 block mb-1">Client Full Name *</label>
                           <input
                             type="text"
+                            required
                             value={editFormData.clientName || ''}
                             onChange={(e) => setEditFormData({ ...editFormData, clientName: e.target.value })}
-                            className="w-full p-2 bg-slate-50 border mt-1"
+                            className="w-full p-2 bg-slate-50 border border-slate-300 font-bold"
                           />
                         </div>
 
                         <div>
-                          <label className="font-bold text-slate-600">Client Phone:</label>
+                          <label className="font-bold text-slate-700 block mb-1">Client Mobile Phone *</label>
                           <input
                             type="text"
+                            required
                             value={editFormData.phone || ''}
                             onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
-                            className="w-full p-2 bg-slate-50 border mt-1"
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                          <label className="font-bold text-slate-600">Next Hearing Date:</label>
+                          <label className="font-bold text-slate-700 block mb-1">Opposing Party / State *</label>
+                          <input
+                            type="text"
+                            value={editFormData.opposingParty || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, opposingParty: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">Court Jurisdiction *</label>
+                          <select
+                            value={editFormData.courtName || 'Allahabad High Court (Prayagraj Main Bench)'}
+                            onChange={(e) => setEditFormData({ ...editFormData, courtName: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
+                          >
+                            <option value="Allahabad High Court (Prayagraj Main Bench)">Allahabad High Court (Prayagraj Main Bench)</option>
+                            <option value="District & Sessions Court (Prayagraj Lower Court)">District &amp; Sessions Court (Prayagraj Lower Court)</option>
+                            <option value="Board of Revenue & Revenue Courts (Prayagraj)">Board of Revenue &amp; Revenue Courts (Prayagraj)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">Matter / Case Type *</label>
+                          <input
+                            type="text"
+                            value={editFormData.caseType || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, caseType: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">Next Hearing Date *</label>
                           <input
                             type="text"
                             value={editFormData.nextHearingDate || ''}
                             onChange={(e) => setEditFormData({ ...editFormData, nextHearingDate: e.target.value })}
-                            className="w-full p-2 bg-slate-50 border mt-1"
+                            className="w-full p-2 bg-slate-50 border border-slate-300 font-bold text-[#c5a059]"
                           />
                         </div>
 
                         <div>
-                          <label className="font-bold text-slate-600">Judge / Bench:</label>
+                          <label className="font-bold text-slate-700 block mb-1">Judge / Bench *</label>
                           <input
                             type="text"
                             value={editFormData.judgeBench || ''}
                             onChange={(e) => setEditFormData({ ...editFormData, judgeBench: e.target.value })}
-                            className="w-full p-2 bg-slate-50 border mt-1"
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
                           />
                         </div>
 
                         <div>
-                          <label className="font-bold text-slate-600">Court Room No:</label>
+                          <label className="font-bold text-slate-700 block mb-1">Court Room No *</label>
                           <input
                             type="text"
                             value={editFormData.courtRoomNo || ''}
                             onChange={(e) => setEditFormData({ ...editFormData, courtRoomNo: e.target.value })}
-                            className="w-full p-2 bg-slate-50 border mt-1"
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">Current Case Stage *</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Counter Affidavit Filed / For Final Arguments"
+                            value={editFormData.stage || editFormData.currentStage || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, stage: e.target.value, currentStage: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border border-slate-300 font-semibold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">Filing Date *</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 10 Jan 2026"
+                            value={editFormData.filingDate || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, filingDate: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border border-slate-300"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">Assigned Advocate *</label>
+                          <input
+                            type="text"
+                            value={editFormData.advocateAssigned || editFormData.assignedAdvocate || 'Advocate Bhavni Singh'}
+                            onChange={(e) => setEditFormData({ ...editFormData, advocateAssigned: e.target.value, assignedAdvocate: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border border-slate-300 font-bold"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-600">Latest Court Order Remarks / Notes:</label>
+                        <label className="font-bold text-slate-700 block mb-1">Latest Court Order Remarks / Order Sheet Summary *</label>
                         <textarea
                           rows={2}
                           value={editFormData.lastOrderRemarks || ''}
                           onChange={(e) => setEditFormData({ ...editFormData, lastOrderRemarks: e.target.value })}
-                          className="w-full p-2 bg-slate-50 border mt-1"
+                          className="w-full p-2 bg-slate-50 border border-slate-300"
                         />
                       </div>
 
@@ -1002,11 +1397,19 @@ export const AdvocatePortalPage: React.FC = () => {
 
                       <div className="flex justify-end gap-2 pt-2">
                         <button
-                          onClick={() => handleUpdateCase(c.id || '')}
-                          className="px-6 py-2.5 bg-[#c5a059] text-white font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+                          type="button"
+                          onClick={() => setEditingCaseId(null)}
+                          className="px-4 py-2 bg-slate-200 text-slate-700 font-bold uppercase tracking-wider hover:bg-slate-300 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCase(c.id || c.caseNumber || '')}
+                          className="px-6 py-2.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm"
                         >
                           <Save className="w-4 h-4" />
-                          <span>Save Changes</span>
+                          <span>Save &amp; Update Case</span>
                         </button>
                       </div>
                     </div>
@@ -1015,10 +1418,15 @@ export const AdvocatePortalPage: React.FC = () => {
                     <>
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
                         <div>
-                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[#1e293b] text-[#c5a059] inline-block mb-1">
-                            {c.caseType}
-                          </span>
-                          <h3 className="text-xl font-serif text-[#1e293b]">{c.caseNumber}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[#1e293b] text-[#c5a059] inline-block">
+                              {c.caseType}
+                            </span>
+                            <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200">
+                              {c.status || 'Active'}
+                            </span>
+                          </div>
+                          <h3 className="text-xl font-serif text-[#1e293b] font-bold">{c.caseNumber}</h3>
                           <p className="text-xs text-slate-500">{c.courtName}</p>
                         </div>
 
@@ -1035,14 +1443,14 @@ export const AdvocatePortalPage: React.FC = () => {
 
                           <button
                             onClick={() => startEditCase(c)}
-                            className="px-3 py-1.5 bg-[#1e293b] text-white hover:bg-slate-800 text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                            className="px-3.5 py-1.5 bg-[#1e293b] text-white hover:bg-slate-800 text-xs font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer"
                           >
                             <Edit2 className="w-3.5 h-3.5 text-[#c5a059]" />
                             <span>Edit Case</span>
                           </button>
 
                           <button
-                            onClick={() => handleDeleteCase(c.id || '')}
+                            onClick={() => handleDeleteCase(c.id || c.caseNumber || '')}
                             className="p-1.5 text-rose-600 hover:bg-rose-50 border border-rose-200 cursor-pointer"
                             title="Delete case"
                           >
@@ -1051,31 +1459,35 @@ export const AdvocatePortalPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-                        <div className="p-3 bg-slate-50 border">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <div className="p-3 bg-slate-50 border border-slate-200">
                           <span className="text-slate-400 font-bold uppercase block text-[10px]">Client Name:</span>
-                          <span className="text-slate-800 font-bold">{c.clientName} ({c.phone})</span>
+                          <span className="text-slate-900 font-bold text-sm block">{c.clientName}</span>
+                          <span className="text-slate-500 font-mono text-[11px]">{c.phone}</span>
                         </div>
 
-                        <div className="p-3 bg-slate-50 border">
+                        <div className="p-3 bg-slate-50 border border-slate-200">
                           <span className="text-slate-400 font-bold uppercase block text-[10px]">Next Hearing Date:</span>
-                          <span className="text-[#c5a059] font-bold text-sm">{c.nextHearingDate}</span>
+                          <span className="text-[#c5a059] font-bold text-sm block">{formatDateToDDMMYYYY(c.nextHearingDate)}</span>
+                          <span className="text-slate-500 text-[11px]">{c.courtRoomNo}</span>
                         </div>
 
-                        <div className="p-3 bg-slate-50 border">
-                          <span className="text-slate-400 font-bold uppercase block text-[10px]">Bench / Courtroom:</span>
-                          <span className="text-slate-800 font-semibold">{c.courtRoomNo} &bull; {c.judgeBench}</span>
+                        <div className="p-3 bg-slate-50 border border-slate-200">
+                          <span className="text-slate-400 font-bold uppercase block text-[10px]">Current Case Stage:</span>
+                          <span className="text-slate-800 font-semibold block">{c.stage || c.currentStage || 'Pending Hearing'}</span>
+                          <span className="text-slate-500 text-[10px]">Filing: {formatDateToDDMMYYYY(c.filingDate || '')}</span>
                         </div>
 
-                        <div className="p-3 bg-slate-50 border">
-                          <span className="text-slate-400 font-bold uppercase block text-[10px]">Case Stage:</span>
-                          <span className="text-slate-800 font-semibold">{c.stage}</span>
+                        <div className="p-3 bg-slate-50 border border-slate-200">
+                          <span className="text-slate-400 font-bold uppercase block text-[10px]">Assigned Advocate:</span>
+                          <span className="text-slate-900 font-bold block">{c.advocateAssigned || c.assignedAdvocate || 'Advocate Bhavni Singh'}</span>
+                          <span className="text-slate-500 text-[10px] truncate block">{c.opposingParty}</span>
                         </div>
                       </div>
 
-                      <div className="text-xs bg-slate-100 p-3 border-l-4 border-[#c5a059] space-y-2">
+                      <div className="text-xs bg-slate-100 p-3.5 border-l-4 border-[#c5a059] space-y-2">
                         <span className="font-bold text-[#1e293b] uppercase tracking-wider block text-[10px] mb-0.5">Order Sheet / Remarks:</span>
-                        <p className="text-slate-700">{c.lastOrderRemarks}</p>
+                        <p className="text-slate-700 leading-relaxed">{c.lastOrderRemarks}</p>
 
                         {(c.highCourtOrderUrl || (c.documents && c.documents.length > 0)) && (
                           <div className="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-white p-2.5 border border-slate-200">
@@ -1119,7 +1531,341 @@ export const AdvocatePortalPage: React.FC = () => {
                   )}
                 </div>
               ))}
+
+              {cases.length === 0 && (
+                <div className="p-12 text-center bg-white border border-slate-200 text-slate-500">
+                  <Scale className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                  <p className="font-bold text-sm text-slate-700">No cases recorded yet.</p>
+                  <p className="text-xs text-slate-400 mt-1">Click "+ File New Case" to register your first client case file.</p>
+                </div>
+              )}
             </div>
+          </div>
+        )}
+
+        {/* TAB: Dedicated Client Directory */}
+        {activeTab === 'clients' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 border border-slate-200">
+              <div className="flex-1 w-full sm:max-w-md relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search client by Name, Mobile, City, Case Type..."
+                  value={clientSearchQuery}
+                  onChange={(e) => setClientSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 text-xs focus:outline-none focus:border-[#c5a059]"
+                />
+              </div>
+
+              <button
+                onClick={() => setShowAddClientModal(true)}
+                className="px-4 py-2 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider hover:bg-slate-800 cursor-pointer flex items-center gap-1.5 shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5 text-[#c5a059]" />
+                <span>Add New Client</span>
+              </button>
+            </div>
+
+            {/* Add Client Modal */}
+            {showAddClientModal && (
+              <div className="p-6 bg-white border-2 border-[#c5a059] shadow-md space-y-4 text-xs">
+                <div className="flex justify-between items-center border-b pb-2">
+                  <h3 className="font-serif font-bold text-base text-[#1e293b] flex items-center gap-2">
+                    <UserCheck className="w-5 h-5 text-[#c5a059]" />
+                    <span>Register New Client in Chamber Directory</span>
+                  </h3>
+                  <button
+                    onClick={() => setShowAddClientModal(false)}
+                    className="text-slate-400 hover:text-slate-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateClient} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Client Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Anand Vikram Singh"
+                        value={newClient.name}
+                        onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+                        className="w-full p-2 bg-slate-50 border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Mobile Phone *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="+91 9415012345"
+                        value={newClient.phone}
+                        onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                        className="w-full p-2 bg-slate-50 border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Email Address</label>
+                      <input
+                        type="email"
+                        placeholder="client@gmail.com"
+                        value={newClient.email}
+                        onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
+                        className="w-full p-2 bg-slate-50 border border-slate-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">City / Native District</label>
+                      <input
+                        type="text"
+                        placeholder="Prayagraj, UP"
+                        value={newClient.city}
+                        onChange={(e) => setNewClient({ ...newClient, city: e.target.value })}
+                        className="w-full p-2 bg-slate-50 border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Primary Case Matter Category</label>
+                      <input
+                        type="text"
+                        placeholder="High Court Writ Petition / Bail"
+                        value={newClient.caseType}
+                        onChange={(e) => setNewClient({ ...newClient, caseType: e.target.value })}
+                        className="w-full p-2 bg-slate-50 border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Client Status</label>
+                      <select
+                        value={newClient.status}
+                        onChange={(e) => setNewClient({ ...newClient, status: e.target.value as any })}
+                        className="w-full p-2 bg-slate-50 border border-slate-300"
+                      >
+                        <option value="Active">Active Litigant</option>
+                        <option value="Consultation">Consultation Stage</option>
+                        <option value="Disposed">Disposed / Concluded</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1">Private Chamber Notes / Case Background</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Enter private background notes, references, or instructions for this client..."
+                      value={newClient.notes}
+                      onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
+                      className="w-full p-2 bg-slate-50 border border-slate-300"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddClientModal(false)}
+                      className="px-4 py-2 bg-slate-200 text-slate-700 font-bold uppercase tracking-wider cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold uppercase tracking-wider cursor-pointer"
+                    >
+                      Save Client to Directory
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Clients List Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {clientsList
+                .filter(cl => {
+                  if (!clientSearchQuery.trim()) return true;
+                  const q = clientSearchQuery.toLowerCase();
+                  return (
+                    cl.name.toLowerCase().includes(q) ||
+                    (cl.phone && cl.phone.includes(q)) ||
+                    (cl.city && cl.city.toLowerCase().includes(q)) ||
+                    (cl.caseType && cl.caseType.toLowerCase().includes(q)) ||
+                    (cl.caseNumbers && cl.caseNumbers.some(cn => cn.toLowerCase().includes(q)))
+                  );
+                })
+                .map((cl) => (
+                <div key={cl.id} className="bg-white border border-slate-200 p-5 shadow-sm space-y-3">
+                  {editingClientId === cl.id ? (
+                    <div className="space-y-3 text-xs">
+                      <div className="flex justify-between items-center border-b pb-2">
+                        <span className="font-serif font-bold text-sm text-[#1e293b]">Edit Client: {cl.name}</span>
+                        <button onClick={() => setEditingClientId(null)} className="text-slate-400 hover:text-slate-700">Cancel</button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-600 block mb-1">Name:</label>
+                          <input
+                            type="text"
+                            value={editClientData.name || ''}
+                            onChange={(e) => setEditClientData({ ...editClientData, name: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-600 block mb-1">Phone:</label>
+                          <input
+                            type="text"
+                            value={editClientData.phone || ''}
+                            onChange={(e) => setEditClientData({ ...editClientData, phone: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="font-bold text-slate-600 block mb-1">City:</label>
+                          <input
+                            type="text"
+                            value={editClientData.city || ''}
+                            onChange={(e) => setEditClientData({ ...editClientData, city: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-600 block mb-1">Email:</label>
+                          <input
+                            type="email"
+                            value={editClientData.email || ''}
+                            onChange={(e) => setEditClientData({ ...editClientData, email: e.target.value })}
+                            className="w-full p-2 bg-slate-50 border"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="font-bold text-slate-600 block mb-1">Notes:</label>
+                        <textarea
+                          rows={2}
+                          value={editClientData.notes || ''}
+                          onChange={(e) => setEditClientData({ ...editClientData, notes: e.target.value })}
+                          className="w-full p-2 bg-slate-50 border"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateClient(cl.id)}
+                          className="px-4 py-2 bg-[#c5a059] text-white font-bold uppercase tracking-wider"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-start justify-between border-b pb-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-serif font-bold text-base text-[#1e293b]">{cl.name}</h4>
+                            <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${
+                              cl.status === 'Active' ? 'bg-emerald-100 text-emerald-800' :
+                              cl.status === 'Consultation' ? 'bg-amber-100 text-amber-800' :
+                              'bg-slate-100 text-slate-600'
+                            }`}>
+                              {cl.status}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500">{cl.city} &bull; {cl.caseType}</p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => startEditClient(cl)}
+                            className="p-1.5 text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50"
+                            title="Edit Client"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClient(cl.id)}
+                            className="p-1.5 text-rose-600 hover:bg-rose-50 border border-rose-200"
+                            title="Delete Client"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="text-xs space-y-1.5 text-slate-700">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 font-bold uppercase text-[10px]">Contact:</span>
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={`tel:${cl.phone}`}
+                              className="font-bold text-[#1e293b] hover:text-[#c5a059] flex items-center gap-1"
+                            >
+                              <Phone className="w-3 h-3 text-[#c5a059]" />
+                              <span>{cl.phone}</span>
+                            </a>
+                            <a
+                              href={`https://wa.me/91${cl.phone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-2 py-0.5 bg-emerald-700 text-white rounded text-[10px] font-bold flex items-center gap-1"
+                            >
+                              <MessageCircle className="w-2.5 h-2.5" /> WhatsApp
+                            </a>
+                          </div>
+                        </div>
+
+                        {cl.caseNumbers && cl.caseNumbers.length > 0 && (
+                          <div className="pt-1">
+                            <span className="text-slate-400 font-bold uppercase text-[10px] block mb-1">Associated Case Numbers:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {cl.caseNumbers.map((cn, i) => (
+                                <span
+                                  key={i}
+                                  onClick={() => {
+                                    setCaseSearchQuery(cn);
+                                    setActiveTab('cases');
+                                  }}
+                                  className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 font-mono text-[10px] font-bold text-slate-800 cursor-pointer"
+                                  title="Click to view case"
+                                >
+                                  {cn}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {cl.notes && (
+                          <div className="p-2.5 bg-slate-50 border-l-2 border-[#c5a059] text-[11px] text-slate-600 mt-2">
+                            <strong>Chamber Notes:</strong> {cl.notes}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {clientsList.length === 0 && (
+              <div className="p-12 text-center bg-white border border-slate-200 text-slate-500">
+                <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="font-bold text-sm text-slate-700">No clients registered in directory yet.</p>
+                <p className="text-xs text-slate-400 mt-1">Click "+ Add New Client" or file a new case to automatically register clients.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -1339,6 +2085,165 @@ export const AdvocatePortalPage: React.FC = () => {
           </div>
         )}
 
+        {/* TAB: Hero Slider Manager (4 Court Slides) */}
+        {activeTab === 'heroSlides' && (
+          <div className="bg-white border border-slate-200 p-6 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#c5a059]">Homepage Hero Banner</span>
+                <h3 className="text-xl font-serif text-[#1e293b]">Manage 4 Court Image Slides</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Advocate Bhavni can upload photos directly for all 4 slides. Slide 1 shows Active Member badge alone, Slide 2 for High Court, Slide 3 for Lower Court, and Slide 4 for Revenue Court.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveAllHeroSlides}
+                className="px-6 py-3 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2 cursor-pointer shadow-md shrink-0"
+              >
+                <Save className="w-4 h-4" />
+                <span>Save Hero Slides</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveAllHeroSlides} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {heroSlidesList.map((slide, idx) => (
+                  <div key={slide.id || idx} className="bg-slate-50 border-2 border-slate-200 p-5 space-y-4 relative shadow-sm hover:border-[#c5a059]/60 transition-colors">
+                    
+                    {/* Slide Header & Number Badge */}
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-7 h-7 rounded-full bg-[#1e293b] text-[#c5a059] font-serif font-bold text-xs flex items-center justify-center">
+                          {idx + 1}
+                        </span>
+                        <h4 className="font-serif font-bold text-slate-900 text-sm">
+                          Slide {idx + 1}: {idx === 0 ? 'Main Chamber Banner' : slide.tag ? `${slide.tag} Banner` : `Court Slide ${idx + 1}`}
+                        </h4>
+                      </div>
+
+                      {slide.tag ? (
+                        <span className="text-[10px] font-bold text-[#c5a059] bg-slate-900 px-2 py-0.5 border border-[#c5a059]/40 uppercase tracking-widest">
+                          {slide.tag}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 uppercase tracking-wider">
+                          No Tag (Member Badge Only)
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Image Thumbnail & Upload Controls */}
+                    <div className="space-y-3">
+                      <label className="block text-xs font-bold uppercase text-slate-700">
+                        Slide Background Image *
+                      </label>
+
+                      <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="w-full sm:w-48 h-28 bg-slate-900 border border-slate-300 relative overflow-hidden shrink-0 shadow-inner">
+                          {slide.image ? (
+                            <img
+                              src={slide.image}
+                              alt={`Slide ${idx + 1}`}
+                              className="w-full h-full object-cover filter brightness-90"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 p-2 text-center text-xs">
+                              <Camera className="w-6 h-6 mb-1 text-slate-400" />
+                              <span>No Image Set</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="w-full space-y-2">
+                          <label className="cursor-pointer px-3 py-2 bg-[#1e293b] hover:bg-[#c5a059] text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 shadow-sm w-full">
+                            <Upload className="w-3.5 h-3.5 text-[#c5a059]" />
+                            <span>Upload Image from Device</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleSlideImageUpload(idx, e)}
+                              className="hidden"
+                            />
+                          </label>
+
+                          <div className="text-[10px] text-slate-500">Or paste direct image URL:</div>
+                          <input
+                            type="text"
+                            value={slide.image}
+                            onChange={(e) => handleUpdateSlideField(idx, 'image', e.target.value)}
+                            placeholder="https://..."
+                            className="w-full p-2 bg-white border border-slate-300 text-xs font-mono text-slate-800"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Badge Tag Field */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                        Court Badge Label (Tag)
+                      </label>
+                      <input
+                        type="text"
+                        value={slide.tag}
+                        onChange={(e) => handleUpdateSlideField(idx, 'tag', e.target.value)}
+                        placeholder={idx === 0 ? "Leave empty for Slide 1" : "e.g. High Court / Lower Court / Revenue Court"}
+                        className="w-full p-2 bg-white border border-slate-300 text-xs text-slate-900 font-semibold"
+                      />
+                      {idx === 0 && (
+                        <p className="text-[10px] text-slate-500 mt-1 italic">
+                          * Note: Per requirements, Slide 1 tag is left empty so only the Active Member badge is displayed.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Title & Subtitle */}
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                          Headline / Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={slide.title}
+                          onChange={(e) => handleUpdateSlideField(idx, 'title', e.target.value)}
+                          className="w-full p-2 bg-white border border-slate-300 text-xs font-bold text-slate-900"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                          Subtitle Description *
+                        </label>
+                        <textarea
+                          rows={2}
+                          required
+                          value={slide.subtitle}
+                          onChange={(e) => handleUpdateSlideField(idx, 'subtitle', e.target.value)}
+                          className="w-full p-2 bg-white border border-slate-300 text-xs text-slate-800"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t flex justify-end">
+                <button
+                  type="submit"
+                  className="px-8 py-3.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2 cursor-pointer shadow-md"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Publish All 4 Hero Slides Live</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
         {/* TAB 3: Manage Chamber Locations & Google Maps */}
         {activeTab === 'locations' && (
           <div className="space-y-8">
@@ -1353,35 +2258,141 @@ export const AdvocatePortalPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {locationsList.map((loc) => (
                   <div key={loc.id} className="p-4 bg-slate-50 border border-slate-200 space-y-3 relative group">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[#1e293b] text-[#c5a059]">
-                          {loc.type}
-                        </span>
-                        <h4 className="text-base font-serif font-bold text-[#1e293b] mt-1">{loc.name}</h4>
+                    {editingLocId === loc.id ? (
+                      <div className="space-y-3 text-xs">
+                        <div className="flex items-center justify-between border-b pb-2">
+                          <h4 className="font-serif font-bold text-[#1e293b]">Editing: {loc.name}</h4>
+                          <button
+                            type="button"
+                            onClick={() => setEditingLocId(null)}
+                            className="text-slate-500 font-bold hover:text-slate-800"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-0.5">Chamber Name:</label>
+                          <input
+                            type="text"
+                            value={editLocData.name || ''}
+                            onChange={(e) => setEditLocData({ ...editLocData, name: e.target.value })}
+                            className="w-full p-2 bg-white border"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-0.5">Full Address:</label>
+                          <input
+                            type="text"
+                            value={editLocData.address || ''}
+                            onChange={(e) => setEditLocData({ ...editLocData, address: e.target.value })}
+                            className="w-full p-2 bg-white border"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="font-bold text-slate-700 block mb-0.5">Landmark:</label>
+                            <input
+                              type="text"
+                              value={editLocData.landmark || ''}
+                              onChange={(e) => setEditLocData({ ...editLocData, landmark: e.target.value })}
+                              className="w-full p-2 bg-white border"
+                            />
+                          </div>
+                          <div>
+                            <label className="font-bold text-slate-700 block mb-0.5">Phone:</label>
+                            <input
+                              type="text"
+                              value={editLocData.phone || ''}
+                              onChange={(e) => setEditLocData({ ...editLocData, phone: e.target.value })}
+                              className="w-full p-2 bg-white border"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-0.5 text-blue-900 flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-rose-600" />
+                            Google Maps Location / Embed URL:
+                          </label>
+                          <input
+                            type="text"
+                            value={editLocData.mapEmbedUrl || ''}
+                            onChange={(e) => setEditLocData({ ...editLocData, mapEmbedUrl: parseMapEmbedUrl(e.target.value) })}
+                            placeholder="Paste Google Maps link or iframe src"
+                            className="w-full p-2 bg-white border border-blue-300 text-blue-900 font-mono text-[11px]"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateLocation(loc.id)}
+                            className="px-4 py-2 bg-[#c5a059] text-white font-bold uppercase text-[11px] tracking-wider flex items-center gap-1 cursor-pointer"
+                          >
+                            <Save className="w-3.5 h-3.5" /> Save Location &amp; Map Link
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        onClick={() => handleDeleteLocation(loc.id)}
-                        className="text-rose-600 hover:text-rose-800 p-1 cursor-pointer"
-                        title="Delete Location"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[#1e293b] text-[#c5a059]">
+                              {loc.type}
+                            </span>
+                            <h4 className="text-base font-serif font-bold text-[#1e293b] mt-1">{loc.name}</h4>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => {
+                                setEditingLocId(loc.id);
+                                setEditLocData(loc);
+                              }}
+                              className="text-slate-600 hover:text-[#c5a059] p-1 cursor-pointer"
+                              title="Edit Location & Google Map Link"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteLocation(loc.id)}
+                              className="text-rose-600 hover:text-rose-800 p-1 cursor-pointer"
+                              title="Delete Location"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
 
-                    <p className="text-xs text-slate-600">{loc.address}</p>
-                    <p className="text-[11px] text-slate-500"><strong>Landmark:</strong> {loc.landmark}</p>
-                    <p className="text-[11px] text-slate-500"><strong>Phone:</strong> {loc.phone} &bull; <strong>Email:</strong> {loc.email}</p>
+                        <p className="text-xs text-slate-600">{loc.address}</p>
+                        <p className="text-[11px] text-slate-500"><strong>Landmark:</strong> {loc.landmark}</p>
+                        <p className="text-[11px] text-slate-500"><strong>Phone:</strong> {loc.phone} &bull; <strong>Email:</strong> {loc.email}</p>
 
-                    <a
-                      href={loc.mapEmbedUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-blue-700"
-                    >
-                      <Navigation className="w-3.5 h-3.5" />
-                      <span>Open Google Maps</span>
-                    </a>
+                        <div className="pt-1 flex items-center gap-2">
+                          <a
+                            href={loc.mapEmbedUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-blue-700"
+                          >
+                            <Navigation className="w-3.5 h-3.5" />
+                            <span>Open Google Maps</span>
+                          </a>
+                          <button
+                            onClick={() => {
+                              setEditingLocId(loc.id);
+                              setEditLocData(loc);
+                            }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                          >
+                            <MapPin className="w-3 h-3 text-rose-600" />
+                            <span>Change Map Link</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1548,7 +2559,7 @@ export const AdvocatePortalPage: React.FC = () => {
                     </div>
                     <h4 className="font-serif font-bold text-slate-900 text-sm">{b.title}</h4>
                     <p className="text-xs text-slate-600 line-clamp-2">{b.excerpt}</p>
-                    <p className="text-[10px] text-slate-400">Published {b.date} &bull; {b.readTime}</p>
+                    <p className="text-[10px] text-slate-400">Published {formatDateToDDMMYYYY(b.date)} &bull; {b.readTime}</p>
                   </div>
                 ))}
               </div>
@@ -1825,12 +2836,75 @@ export const AdvocatePortalPage: React.FC = () => {
                     onChange={(e) => setNewCase({ ...newCase, courtName: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-300"
                   >
-                    <option value="Allahabad High Court (Prayagraj)">Allahabad High Court (Prayagraj)</option>
+                    <option value="Allahabad High Court (Prayagraj Main Bench)">Allahabad High Court (Prayagraj Main Bench)</option>
                     <option value="District & Sessions Court (Prayagraj Lower Court)">District &amp; Sessions Court (Prayagraj Lower Court)</option>
                     <option value="Board of Revenue & Revenue Courts (Prayagraj)">Board of Revenue &amp; Revenue Courts (Prayagraj)</option>
                   </select>
                 </div>
 
+                <div>
+                  <label className="block font-bold uppercase text-slate-700 mb-1">Matter / Case Category *</label>
+                  <select
+                    value={newCase.caseType}
+                    onChange={(e) => setNewCase({ ...newCase, caseType: e.target.value })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300"
+                  >
+                    <option value="High Court Writ Petition (Article 226)">High Court Writ Petition (Article 226)</option>
+                    <option value="Criminal Bail & Quashing (Sec 482 / BNSS 528)">Criminal Bail &amp; Quashing (Sec 482 / BNSS 528)</option>
+                    <option value="UP Revenue Code Land Appeal & Mutation">UP Revenue Code Land Appeal &amp; Mutation</option>
+                    <option value="Civil Review & First Appeal (FAFO)">Civil Review &amp; First Appeal (FAFO)</option>
+                    <option value="Service & Teacher Pension Dispute">Service &amp; Teacher Pension Dispute</option>
+                    <option value="Matrimonial & 498A Quashing">Matrimonial &amp; 498A Quashing</option>
+                    <option value="Lower Court Criminal Trial Defense">Lower Court Criminal Trial Defense</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold uppercase text-slate-700 mb-1">Current Case Stage *</label>
+                  <select
+                    value={newCase.stage}
+                    onChange={(e) => setNewCase({ ...newCase, stage: e.target.value })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 font-semibold"
+                  >
+                    <option value="Counter Affidavit Filed / For Final Arguments">Counter Affidavit Filed / For Final Arguments</option>
+                    <option value="Notice Issued to State & Standing Counsel">Notice Issued to State &amp; Standing Counsel</option>
+                    <option value="Order Reserved / For Judgment Pronouncement">Order Reserved / For Judgment Pronouncement</option>
+                    <option value="Plea for Urgent Stay Hearing Listed">Plea for Urgent Stay Hearing Listed</option>
+                    <option value="Fresh Motion Admission & Interim Stay">Fresh Motion Admission &amp; Interim Stay</option>
+                    <option value="Bail Granted / Bail Order Certified">Bail Granted / Bail Order Certified</option>
+                    <option value="Evidence & Prosecution Witness Examination">Evidence &amp; Prosecution Witness Examination</option>
+                    <option value="Written Arguments / Reply Submitted">Written Arguments / Reply Submitted</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase text-slate-700 mb-1">Filing Date *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 14 Feb 2026"
+                    value={newCase.filingDate}
+                    onChange={(e) => setNewCase({ ...newCase, filingDate: e.target.value })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold uppercase text-slate-700 mb-1">Assigned Advocate *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Advocate Bhavni Singh"
+                    value={newCase.advocateAssigned}
+                    onChange={(e) => setNewCase({ ...newCase, advocateAssigned: e.target.value })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block font-bold uppercase text-slate-700 mb-1">Next Hearing Date *</label>
                   <input
@@ -1842,13 +2916,12 @@ export const AdvocatePortalPage: React.FC = () => {
                     className="w-full p-2.5 bg-slate-50 border border-slate-300"
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-bold uppercase text-slate-700 mb-1">Judge / Bench *</label>
                   <input
                     type="text"
+                    placeholder="Hon'ble Justice ..."
                     value={newCase.judgeBench}
                     onChange={(e) => setNewCase({ ...newCase, judgeBench: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-300"
@@ -1859,6 +2932,7 @@ export const AdvocatePortalPage: React.FC = () => {
                   <label className="block font-bold uppercase text-slate-700 mb-1">Court Room Number *</label>
                   <input
                     type="text"
+                    placeholder="Court No. 34"
                     value={newCase.courtRoomNo}
                     onChange={(e) => setNewCase({ ...newCase, courtRoomNo: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-300"

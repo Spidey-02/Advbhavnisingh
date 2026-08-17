@@ -30,7 +30,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* Two-Way System Direct Quick Case Status Search Bar */}
       <section className="bg-gradient-to-r from-[#1e293b] via-slate-900 to-[#1e293b] py-8 text-white border-y border-[#c5a059]/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-[#c5a059] text-white shrink-0">
               <Scale className="w-6 h-6" />

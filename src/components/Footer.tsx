@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   return (
     <footer className="bg-[#1e293b] text-slate-300 pt-16 pb-8 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
         
         {/* Top 4 Columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800">
@@ -43,8 +43,8 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              {firmDetails.aboutText}
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Dedicated litigation advocacy before the Allahabad High Court, District &amp; Lower Courts, and Board of Revenue Courts (Prayagraj).
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3">

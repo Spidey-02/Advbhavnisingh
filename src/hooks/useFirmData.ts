@@ -4,21 +4,24 @@ import {
   getStoredOfficeLocations,
   getStoredBlogs,
   getStoredCaseStudies,
+  getStoredHeroSlides,
   FirmDetailsType
 } from '../data/firmStore';
-import { OfficeLocation, BlogPost, CaseStudy } from '../types';
+import { OfficeLocation, BlogPost, CaseStudy, HeroSlide } from '../types';
 
 export const useFirmData = () => {
   const [firmDetails, setFirmDetails] = useState<FirmDetailsType>(getStoredFirmDetails());
   const [officeLocations, setOfficeLocations] = useState<OfficeLocation[]>(getStoredOfficeLocations());
   const [blogs, setBlogs] = useState<BlogPost[]>(getStoredBlogs());
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(getStoredCaseStudies());
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(getStoredHeroSlides());
 
   const refreshData = () => {
     setFirmDetails(getStoredFirmDetails());
     setOfficeLocations(getStoredOfficeLocations());
     setBlogs(getStoredBlogs());
     setCaseStudies(getStoredCaseStudies());
+    setHeroSlides(getStoredHeroSlides());
   };
 
   useEffect(() => {
@@ -37,6 +40,7 @@ export const useFirmData = () => {
     officeLocations,
     blogs,
     caseStudies,
+    heroSlides,
     refreshData
   };
 };

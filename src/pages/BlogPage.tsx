@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFirmData } from '../hooks/useFirmData';
 import { BlogPost } from '../types';
+import { formatDateToDDMMYYYY } from '../utils/dateFormatter';
 import { Calendar, User, Clock, Search, ArrowRight, Share2, Bookmark, X } from 'lucide-react';
 
 export const BlogPage: React.FC = () => {
@@ -99,7 +100,7 @@ export const BlogPage: React.FC = () => {
                   <div className="flex items-center gap-3 text-[11px] text-slate-400">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-[#c5a059]" />
-                      {post.date}
+                      {formatDateToDDMMYYYY(post.date)}
                     </span>
                     <span>&bull;</span>
                     <span className="flex items-center gap-1">
@@ -157,7 +158,7 @@ export const BlogPage: React.FC = () => {
               <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
                 <span>By <strong>{selectedPost.author}</strong> ({selectedPost.authorRole})</span>
                 <span>&bull;</span>
-                <span>{selectedPost.date}</span>
+                <span>{formatDateToDDMMYYYY(selectedPost.date)}</span>
                 <span>&bull;</span>
                 <span>{selectedPost.readTime}</span>
               </div>

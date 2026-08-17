@@ -42,8 +42,8 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full shadow-sm bg-white border-b border-slate-200">
       {/* Top Contact & High Court Bar */}
-      <div className="bg-[#1e293b] text-slate-300 text-xs py-2 px-4 sm:px-8 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div className="bg-[#1e293b] text-slate-300 text-xs py-2 px-4 sm:px-8 md:px-12 lg:px-16 border-b border-slate-700">
+        <div className="max-w-[1600px] w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-5">
             <a 
               href={`tel:${firmDetails.phone}`} 
@@ -86,56 +86,32 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+      {/* Main Brand & Action Header Row */}
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-3.5 flex items-center justify-between gap-6 border-b border-slate-100">
         
         {/* Brand Logo & Name */}
         <div 
           onClick={() => handleNavClick('/home')}
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-3.5 cursor-pointer group shrink-0"
         >
-          <div className="w-10 h-10 bg-[#1e293b] flex items-center justify-center shrink-0 group-hover:bg-[#c5a059] transition-colors">
-            <Scale className="w-5 h-5 text-[#c5a059] group-hover:text-white transition-colors" />
+          <div className="w-11 h-11 bg-[#1e293b] flex items-center justify-center shrink-0 group-hover:bg-[#c5a059] transition-colors shadow-md">
+            <Scale className="w-6 h-6 text-[#c5a059] group-hover:text-white transition-colors" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-bold font-serif-heading tracking-tight text-[#1e293b] group-hover:text-[#c5a059] transition-colors uppercase">
+            <h1 className="text-xl sm:text-2xl font-bold font-serif-heading tracking-tight text-[#1e293b] group-hover:text-[#c5a059] transition-colors uppercase leading-tight">
               {firmDetails.name}
             </h1>
-            <p className="text-[10px] sm:text-xs font-semibold tracking-widest text-[#c5a059] uppercase truncate max-w-md">
+            <p className="text-[11px] sm:text-xs font-bold tracking-wider text-[#c5a059] uppercase leading-snug">
               {firmDetails.tagline}
             </p>
           </div>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {navItems.map((item) => {
-            const isActive = currentPath === item.path;
-            const isPortal = item.path === '/client-portal' || item.path === '/advocate-portal';
-            
-            return (
-              <button
-                key={item.path}
-                onClick={() => handleNavClick(item.path)}
-                className={`px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                  isActive 
-                    ? 'text-[#c5a059] border-b-2 border-[#c5a059]' 
-                    : isPortal
-                      ? 'text-[#1e293b] bg-slate-100 hover:bg-[#c5a059] hover:text-white px-2.5 py-1.5'
-                      : 'text-slate-700 hover:text-[#c5a059]'
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
-
         {/* Action Button & Mobile Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onOpenAppointment}
-            className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm cursor-pointer"
+            className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md cursor-pointer border border-[#c5a059]/50"
           >
             <span>Book Consultation</span>
           </button>
@@ -149,6 +125,32 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
+      </div>
+
+      {/* Single-Line Desktop Main Navigation Bar */}
+      <div className="hidden lg:block bg-slate-900 text-white border-b border-slate-800 shadow-inner">
+        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16 flex items-center justify-center gap-1 xl:gap-2">
+          {navItems.map((item) => {
+            const isActive = currentPath === item.path;
+            const isPortal = item.path === '/client-portal' || item.path === '/advocate-portal';
+            
+            return (
+              <button
+                key={item.path}
+                onClick={() => handleNavClick(item.path)}
+                className={`px-3.5 xl:px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  isActive 
+                    ? 'bg-[#c5a059] text-white shadow-md' 
+                    : isPortal
+                      ? 'text-[#c5a059] hover:bg-slate-800 hover:text-white font-extrabold'
+                      : 'text-slate-300 hover:bg-slate-800 hover:text-[#c5a059]'
+                }`}
+              >
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Mobile Menu */}

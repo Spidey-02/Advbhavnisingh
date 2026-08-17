@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DEMO_CLIENT_CASE } from '../data/legalData';
 import { ClientCase } from '../types';
+import { formatDateToDDMMYYYY } from '../utils/dateFormatter';
 import { ShieldCheck, Lock, FileText, Calendar, DollarSign, MessageSquare, Download, Send, CheckCircle2, AlertCircle, User, LogOut, Key } from 'lucide-react';
 
 export const ClientPortal: React.FC = () => {
@@ -197,7 +198,7 @@ export const ClientPortal: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-slate-950 p-5 border border-slate-800 space-y-1">
                       <p className="text-xs text-slate-400 uppercase font-semibold">Next Hearing Date</p>
-                      <p className="text-2xl font-serif text-[#c5a059]">{caseData.nextHearingDate}</p>
+                      <p className="text-2xl font-serif text-[#c5a059]">{formatDateToDDMMYYYY(caseData.nextHearingDate)}</p>
                       <p className="text-xs text-slate-400">Saket Family Court Complex</p>
                     </div>
 
@@ -239,7 +240,7 @@ export const ClientPortal: React.FC = () => {
                           </div>
                           <div>
                             <p className="text-xs sm:text-sm font-semibold text-slate-100">{doc.title}</p>
-                            <p className="text-[11px] text-slate-400">{doc.date} &bull; {doc.size}</p>
+                            <p className="text-[11px] text-slate-400">{formatDateToDDMMYYYY(doc.date)} &bull; {doc.size}</p>
                           </div>
                         </div>
 
@@ -268,7 +269,7 @@ export const ClientPortal: React.FC = () => {
                     {caseData.hearingsHistory.map((h, idx) => (
                       <div key={idx} className="p-4 bg-slate-950 border border-slate-800 space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-[#c5a059]">{h.date}</span>
+                          <span className="text-xs font-bold text-[#c5a059]">{formatDateToDDMMYYYY(h.date)}</span>
                           <span className="text-xs font-semibold text-slate-300">{h.stage}</span>
                         </div>
                         <p className="text-xs text-slate-400">{h.summary}</p>
@@ -287,7 +288,7 @@ export const ClientPortal: React.FC = () => {
                       <div key={idx} className="p-4 bg-slate-950 border border-slate-800 flex items-center justify-between gap-4">
                         <div>
                           <p className="text-sm font-bold text-slate-100">{inv.invoiceNo}</p>
-                          <p className="text-xs text-slate-400">Billed on {inv.date}</p>
+                          <p className="text-xs text-slate-400">Billed on {formatDateToDDMMYYYY(inv.date)}</p>
                         </div>
                         <div className="flex items-center gap-4">
                           <span className="text-base font-bold text-[#c5a059]">{inv.amount}</span>

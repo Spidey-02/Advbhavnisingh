@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { FloatingActions } from './components/FloatingActions';
 import { Footer } from './components/Footer';
 import { EnquiryModal } from './components/EnquiryModal';
+import { SEOHead } from './components/SEOHead';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -120,6 +121,8 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased flex flex-col selection:bg-[#c5a059] selection:text-white">
+      {/* Dynamic SEO Meta & Title Manager */}
+      <SEOHead currentPath={currentPath} />
       
       {/* Bar Council Disclaimer Modal */}
       <DisclaimerModal

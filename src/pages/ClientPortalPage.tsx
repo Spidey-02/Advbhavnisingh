@@ -4,6 +4,7 @@ import { ClientCase } from '../types';
 import { Search, Calendar, FileText, ExternalLink, Scale, CheckCircle2, AlertCircle, Clock, Share2, Plus, Download, BellRing, Database, User } from 'lucide-react';
 import { CourtCaseTrackerSection } from '../components/CourtCaseTrackerSection';
 import { getApiUrl } from '../config';
+import { formatDateToDDMMYYYY, parseDDMMYYYYToDate } from '../utils/dateFormatter';
 
 export const ClientPortalPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,14 +80,15 @@ export const ClientPortalPage: React.FC = () => {
   };
 
   const createGoogleCalendarUrl = (c: ClientCase) => {
+    const formattedDate = formatDateToDDMMYYYY(c.nextHearingDate);
     const title = encodeURIComponent(`Court Hearing: ${c.caseNumber} - ${c.courtName}`);
-    const details = encodeURIComponent(`Hearing Date for ${c.clientName}.\nCourt: ${c.courtName}\nJudge/Bench: ${c.judgeBench}\nCourtroom: ${c.courtRoomNo}\nStage: ${c.stage}\nLawyer: Advocate Bhavni Singh (+91 9415211990)`);
+    const details = encodeURIComponent(`Hearing Date (${formattedDate}) for ${c.clientName}.\nCourt: ${c.courtName}\nJudge/Bench: ${c.judgeBench}\nCourtroom: ${c.courtRoomNo}\nStage: ${c.stage || c.currentStage}\nLawyer: Advocate Bhavni Singh (+91 9415211990)`);
     const location = encodeURIComponent(`${c.courtName}, Prayagraj`);
     
     // Format date YYYYMMDD
     let dateStr = '20260915';
     try {
-      const d = new Date(c.nextHearingDate);
+      const d = parseDDMMYYYYToDate(formattedDate);
       if (!isNaN(d.getTime())) {
         const yyyy = d.getFullYear();
         const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -236,7 +238,7 @@ export const ClientPortalPage: React.FC = () => {
                         Client: <strong>{c.clientName}</strong> vs {c.opposingParty}
                       </p>
                       <p className={`text-[11px] mt-1 font-semibold ${selectedCase?.id === c.id ? 'text-[#c5a059]' : 'text-[#1e293b]'}`}>
-                        Next Hearing: {c.nextHearingDate}
+                        Next Hearing: {formatDateToDDMMYYYY(c.nextHearingDate)}
                       </p>
                     </div>
                   ))}
@@ -265,7 +267,7 @@ export const ClientPortalPage: React.FC = () => {
                     <div className="bg-gradient-to-r from-[#1e293b] to-slate-900 text-white p-6 border-l-4 border-[#c5a059] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <span className="text-[10px] font-bold text-[#c5a059] uppercase tracking-widest block">Upcoming Court Hearing</span>
-                        <h3 className="text-2xl font-serif text-white mt-0.5">{selectedCase.nextHearingDate}</h3>
+                        <h3 className="text-2xl font-serif text-white mt-0.5">{formatDateToDDMMYYYY(selectedCase.nextHearingDate)}</h3>
                         <p className="text-xs text-slate-300 mt-1">
                           Bench: {selectedCase.judgeBench} &bull; Room No: <strong>{selectedCase.courtRoomNo}</strong>
                         </p>
@@ -293,10 +295,18 @@ export const ClientPortalPage: React.FC = () => {
                     </div>
 
                     {/* Case Details Table Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
                       <div className="p-3.5 bg-slate-50 border border-slate-200">
-                        <span className="text-slate-400 font-bold uppercase block text-[10px]">Client Name:</span>
-                        <span className="text-slate-800 font-bold text-sm">{selectedCase.clientName}</span>
+                        <span className="text-slate-400 font-bold uppercase block text-[10px]">Case Filing Number:</span>
+                        <span className="text-slate-900 font-bold text-sm font-mono">{selectedCase.caseNumber}</span>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-50 border border-slate-200">
+                        <span className="text-slate-400 font-bold uppercase block text-[10px]">Client Full Name:</span>
+                        <span className="text-slate-800 font-bold text-sm block">{selectedCase.clientName}</span>
+                        {selectedCase.phone && (
+                          <span className="text-[#c5a059] font-bold text-xs block font-mono mt-0.5">📱 {selectedCase.phone}</span>
+                        )}
                       </div>
 
                       <div className="p-3.5 bg-slate-50 border border-slate-200">
@@ -305,23 +315,33 @@ export const ClientPortalPage: React.FC = () => {
                       </div>
 
                       <div className="p-3.5 bg-slate-50 border border-slate-200">
-                        <span className="text-slate-400 font-bold uppercase block text-[10px]">Case Category:</span>
-                        <span className="text-slate-800 font-bold text-sm">{selectedCase.caseType}</span>
+                        <span className="text-slate-400 font-bold uppercase block text-[10px]">High Court Bench / Jurisdiction:</span>
+                        <span className="text-slate-800 font-bold text-sm">{selectedCase.courtName}</span>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-50 border border-slate-200">
+                        <span className="text-slate-400 font-bold uppercase block text-[10px]">Judge / Bench:</span>
+                        <span className="text-slate-800 font-bold text-sm">{selectedCase.judgeBench || 'Hon’ble Allahabad High Court Bench'}</span>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-50 border border-slate-200">
+                        <span className="text-slate-400 font-bold uppercase block text-[10px]">Court Room Number:</span>
+                        <span className="text-slate-800 font-bold text-sm">Room No. {selectedCase.courtRoomNo}</span>
                       </div>
 
                       <div className="p-3.5 bg-slate-50 border border-slate-200">
                         <span className="text-slate-400 font-bold uppercase block text-[10px]">Current Case Stage:</span>
-                        <span className="text-slate-800 font-bold text-sm">{selectedCase.stage}</span>
+                        <span className="text-slate-800 font-bold text-sm">{selectedCase.stage || selectedCase.currentStage || 'Active Proceeding'}</span>
                       </div>
 
                       <div className="p-3.5 bg-slate-50 border border-slate-200">
                         <span className="text-slate-400 font-bold uppercase block text-[10px]">Filing Date:</span>
-                        <span className="text-slate-800 font-bold text-sm">{selectedCase.filingDate}</span>
+                        <span className="text-slate-800 font-bold text-sm">{formatDateToDDMMYYYY(selectedCase.filingDate)}</span>
                       </div>
 
                       <div className="p-3.5 bg-slate-50 border border-slate-200">
                         <span className="text-slate-400 font-bold uppercase block text-[10px]">Assigned Advocate:</span>
-                        <span className="text-[#1e293b] font-bold text-sm">{selectedCase.advocateAssigned}</span>
+                        <span className="text-[#1e293b] font-bold text-sm">{selectedCase.advocateAssigned || selectedCase.assignedAdvocate || 'Advocate Bhavni Singh'}</span>
                       </div>
                     </div>
 
@@ -365,7 +385,7 @@ export const ClientPortalPage: React.FC = () => {
                               <div key={`${selectedCase.id}-doc-${docIdx}`} className="p-2.5 bg-slate-800/90 border border-slate-700 flex items-center justify-between gap-2 text-xs">
                                 <div className="min-w-0 flex-1">
                                   <p className="font-bold text-slate-200 truncate">{doc.title}</p>
-                                  <p className="text-[10px] text-slate-400">{doc.type} &bull; {doc.date} &bull; {doc.size}</p>
+                                  <p className="text-[10px] text-slate-400">{doc.type} &bull; {formatDateToDDMMYYYY(doc.date)} &bull; {doc.size}</p>
                                 </div>
                                 <a
                                   href={doc.url && doc.url !== '#' ? doc.url : (selectedCase.highCourtOrderUrl || FIRM_DETAILS.highCourtJudgmentsPortal)}

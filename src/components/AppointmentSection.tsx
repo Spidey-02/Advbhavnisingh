@@ -37,7 +37,7 @@ export const AppointmentSection: React.FC<AppointmentSectionProps> = ({
 
   return (
     <section id="appointment-section" className="py-16 sm:py-24 bg-slate-50 border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
           

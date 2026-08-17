@@ -26,7 +26,7 @@ export const WayWeWork: React.FC = () => {
 
   return (
     <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
         
         {/* Title */}
         <div className="mb-12">
@@ -43,7 +43,7 @@ export const WayWeWork: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
             {steps.map((step) => (
-              <div key={step.num} className="flex flex-col items-start bg-white p-6 shadow-sm border border-slate-200 hover:border-[#c5a059] transition-colors">
+              <div key={step.num} className="flex flex-col items-start bg-white p-6 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 border border-slate-200 hover:border-[#c5a059]">
                 {/* Number Box */}
                 <div className="w-12 h-12 bg-[#1e293b] text-[#c5a059] font-serif font-bold text-lg flex items-center justify-center mb-4 shadow-sm border-b-2 border-[#c5a059] shrink-0">
                   0{step.num}

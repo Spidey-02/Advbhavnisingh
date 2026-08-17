@@ -33,7 +33,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenAppointm
               <div className="bg-[#1e293b] p-4 text-center text-white mt-2">
                 <h3 className="text-xl font-serif text-[#c5a059]">Advocate Bhavni Singh</h3>
                 <p className="text-xs text-slate-300 font-semibold">{FIRM_DETAILS.enrollmentNo}</p>
-                <p className="text-[11px] text-slate-400 mt-1">Founder &amp; Principal Advocate</p>
+                <p className="text-[11px] text-slate-400 mt-1">High Court of Judicature at Allahabad</p>
               </div>
             </div>
           </div>

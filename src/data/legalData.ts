@@ -37,13 +37,20 @@ export const FIRM_DETAILS = {
   }
 };
 
+import imgHighCourtWrits from '../assets/images/high_court_writs_1786990635127.jpg';
+import imgCriminalBail from '../assets/images/criminal_bail_law_1786990657965.jpg';
+import imgLandRevenue from '../assets/images/land_revenue_dispute_1786990678182.jpg';
+import imgMatrimonial from '../assets/images/matrimonial_family_law_1786990696184.jpg';
+import imgServiceLaw from '../assets/images/service_administrative_law_1786990715316.jpg';
+import imgSupremeCourt from '../assets/images/supreme_court_appeals_1786990733993.jpg';
+
 export const PRACTICE_AREAS: PracticeArea[] = [
   {
     id: "allahabad-high-court-writs",
     title: "High Court Writ Petitions",
     shortDesc: "Specialized Constitutional Writs (Art. 226/227) before the Hon'ble High Court of Judicature at Allahabad for land, service & fundamental rights.",
     category: "writ",
-    imageUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+    imageUrl: imgHighCourtWrits,
     keyServices: [
       "Writ Petition (Civil) & Writ Petition (Criminal) under Article 226",
       "Quashing of Illegal FIRs / Stay on Arrest (Art. 226 Petitions)",
@@ -58,7 +65,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
     title: "High Court Bail & Criminal Appeals",
     shortDesc: "Aggressive representation for Anticipatory Bail, Regular Bail, and Criminal Appeals before the High Court of Judicature at Allahabad.",
     category: "criminal",
-    imageUrl: "https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=800&q=80",
+    imageUrl: imgCriminalBail,
     keyServices: [
       "Section 482 CrPC / BNSS Petitions for Quashing Criminal Cases",
       "Anticipatory & Regular Bail before Allahabad High Court",
@@ -73,7 +80,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
     title: "Land & Revenue Disputes",
     shortDesc: "Comprehensive legal defense in UP Revenue Code, Land Acquisition, Revenue Board Appeals, and Title Suits.",
     category: "civil",
-    imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+    imageUrl: imgLandRevenue,
     keyServices: [
       "Board of Revenue Appeals & Revision Petitions (Prayagraj)",
       "UP Revenue Code Sec 24 Boundary Demarcation & Mutation Suits",
@@ -88,7 +95,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
     title: "Matrimonial & Family Law",
     shortDesc: "Expert legal counsel for Mutual Consent & Contested Divorces, Maintenance, 498A Defense, and Child Custody before Family & High Courts.",
     category: "family",
-    imageUrl: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80",
+    imageUrl: imgMatrimonial,
     keyServices: [
       "Mutual Consent Divorce under Sec 13B Hindu Marriage Act",
       "Contested Divorce Proceedings & High Court First Appeals (FAFO)",
@@ -103,7 +110,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
     title: "UP Service & Administrative Matters",
     shortDesc: "Defending state government employees, police personnel, teachers, and PSU officials in service disputes & State Public Services Tribunal.",
     category: "tribunal",
-    imageUrl: "https://images.unsplash.com/photo-1453728013993-6d66e9c9123a?auto=format&fit=crop&w=800&q=80",
+    imageUrl: imgServiceLaw,
     keyServices: [
       "High Court Service Writs against Arbitrary Suspensions",
       "Seniority List & Promotion Denial Challenges",
@@ -118,7 +125,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
     title: "Supreme Court SLPs & Appeals",
     shortDesc: "Direct representation before the Supreme Court of India in Special Leave Petitions (SLPs), Transfer Petitions, and Writ Writs.",
     category: "tribunal",
-    imageUrl: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
+    imageUrl: imgSupremeCourt,
     keyServices: [
       "Special Leave Petition (Civil) & (Criminal) against High Court Judgments",
       "Transfer Petitions for Matrimonial Cases to different States",
@@ -130,50 +137,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
   }
 ];
 
-export const CASE_STUDIES: CaseStudy[] = [
-  {
-    id: "cs-hc-01",
-    title: "Landmark Writ Petition Quashing Arbitrary Acquisition Order & Restoring 18 Acres Land",
-    practiceArea: "High Court Writ & Revenue Law",
-    court: "Hon'ble High Court of Judicature at Allahabad",
-    year: "2025",
-    summary: "Successfully secured a favorable judgment in Writ-C No. 18294/2024 quashing a state revenue acquisition order without compensation.",
-    challenge: "District authorities had re-classified ancestral agricultural land as state reserve without issuing statutory notice under UP Revenue Code.",
-    strategy: "Advocate Bhavni Singh filed an urgent Writ Petition (Civil) under Article 226, demonstrating non-compliance with principles of natural justice and Constitutional Article 300A.",
-    verdictOutcome: "High Court Division Bench quashed the revenue order, restored possession to farmers, and levied costs on state officers.",
-    impact: "Saved agricultural livelihoods of 14 farming families in Prayagraj region.",
-    category: "writ",
-    clientAnonymized: "Prayagraj Agricultural Union"
-  },
-  {
-    id: "cs-hc-02",
-    title: "Anticipatory Bail & Quashing of Malicious Criminal Proceedings in High Court",
-    practiceArea: "Criminal Defense & High Court Bail",
-    court: "Allahabad High Court (Main Bench)",
-    year: "2025",
-    summary: "Secured complete quashing of FIR under Section 482 CrPC for a falsely implicated businessman.",
-    challenge: "Rival business firm filed a fabricated FIR alleging forgery and criminal breach of trust under IPC Sec 420/467.",
-    strategy: "Demonstrated documentary proof of valid contractual receipts and lack of prima facie criminal intent during High Court argument.",
-    verdictOutcome: "Hon'ble High Court quashed the charge sheet and stay of all coercive actions granted unconditionally.",
-    impact: "Client saved from harassment and criminal record cleared.",
-    category: "criminal",
-    clientAnonymized: "Commercial Industrialist"
-  },
-  {
-    id: "cs-hc-03",
-    title: "Supreme Court SLP Granting Stay on High Court Order in Service Seniority Dispute",
-    practiceArea: "Supreme Court & Service Writs",
-    court: "Supreme Court of India",
-    year: "2024",
-    summary: "Secured stay on adverse promotion list impacting 45 UP Higher Education Service professors.",
-    challenge: "High Court single judge order altered 15-year-old seniority list retrospectively.",
-    strategy: "Filed SLP (Civil) highlighting violation of settled administrative law and doctrine of legitimate expectation.",
-    verdictOutcome: "Supreme Court issued notice, stayed the operation of High Court order, and protected senior professors' designations.",
-    impact: "Restored seniority ranking across UP state universities.",
-    category: "tribunal",
-    clientAnonymized: "UP University Faculty Association"
-  }
-];
+export const CASE_STUDIES: CaseStudy[] = [];
 
 export const BLOG_POSTS: BlogPost[] = [
   {
@@ -182,7 +146,7 @@ export const BLOG_POSTS: BlogPost[] = [
     category: "High Court Procedure",
     author: "Adv. Bhavni Singh",
     authorRole: "Senior Advocate & Founder",
-    date: "Aug 05, 2026",
+    date: "05/08/2026",
     readTime: "5 min read",
     imageUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
     excerpt: "Learn how clients and litigants can easily track Writ Petitions, Criminal Appeals, and daily hearing cause lists on the Allahabad High Court portal.",
@@ -204,7 +168,7 @@ Clients represented by Bhavni Singh & Associates do not need to struggle with co
     category: "Criminal Law",
     author: "Legal Research Team",
     authorRole: "Bhavni Singh & Associates",
-    date: "Jul 28, 2026",
+    date: "28/07/2026",
     readTime: "7 min read",
     imageUrl: "https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=800&q=80",
     excerpt: "Inherent powers of the High Court to prevent abuse of legal process and quash false criminal complaints under Indian laws.",
@@ -288,7 +252,104 @@ export const OFFICE_LOCATIONS: OfficeLocation[] = [
   }
 ];
 
-export const INITIAL_CLIENT_CASES: ClientCase[] = [];
+export const INITIAL_CLIENT_CASES: ClientCase[] = [
+  {
+    id: "case-writ-91022",
+    caseNumber: "WRIT/2026/91022",
+    clientName: "Ramesh Chandra Verma",
+    phone: "+91 9839012345",
+    opposingParty: "State of U.P. through Principal Secretary (Revenue) & 3 Others",
+    caseType: "Writ Petition (Article 226/227)",
+    courtName: "Allahabad High Court (Prayagraj Main Bench)",
+    nextHearingDate: "18/09/2026",
+    judgeBench: "Hon'ble Justice Rameshwar Nath & Justice A.K. Roy",
+    courtRoomNo: "Court No. 34",
+    status: "Pending Hearing",
+    stage: "Counter Affidavit Filed / For Final Arguments",
+    currentStage: "Counter Affidavit Filed / For Final Arguments",
+    filingDate: "10/01/2026",
+    assignedAdvocate: "Advocate Bhavni Singh",
+    advocateAssigned: "Advocate Bhavni Singh",
+    statusBadge: "Active",
+    lastOrderRemarks: "Division Bench directed State counsel to produce original revenue records on next date. Interim stay on recovery extended till next date of listing.",
+    highCourtOrderUrl: "https://allahabadhighcourt.in/casestatus/",
+    documents: [
+      {
+        title: "High_Court_Order_Sheet_WRIT_91022.pdf",
+        date: "10/08/2026",
+        size: "1.4 MB",
+        type: "Certified Order Copy",
+        url: "#"
+      }
+    ],
+    hearingsHistory: [
+      { date: "10/08/2026", stage: "Interim Stay Extended", summary: "Order passed extending protection; listed for final hearing." },
+      { date: "12/05/2026", stage: "Notice Issued", summary: "Notice issued to State respondents; Counter affidavit called." }
+    ],
+    invoices: [],
+    messages: []
+  },
+  {
+    id: "case-bail-41029",
+    caseNumber: "BAIL/2026/41029",
+    clientName: "Santosh Kumar Pandey",
+    phone: "+91 9415099881",
+    opposingParty: "State of U.P. & Informant",
+    caseType: "Criminal Bail Application (Section 439 CrPC)",
+    courtName: "Allahabad High Court (Prayagraj)",
+    nextHearingDate: "24/08/2026",
+    judgeBench: "Hon'ble Justice Vikramaditya Singh",
+    courtRoomNo: "Court No. 12",
+    status: "Listed for Hearing",
+    stage: "Case Dairy Summoned / Arguments Listed",
+    currentStage: "Case Dairy Summoned / Arguments Listed",
+    filingDate: "15/02/2026",
+    assignedAdvocate: "Advocate Bhavni Singh",
+    advocateAssigned: "Advocate Bhavni Singh",
+    statusBadge: "Active",
+    lastOrderRemarks: "Case diary produced by learned AGA. Put up on 24/08/2026 as unlisted for concluding bail arguments.",
+    highCourtOrderUrl: "https://allahabadhighcourt.in/casestatus/",
+    documents: [
+      {
+        title: "Bail_Application_Order_41029.pdf",
+        date: "02/08/2026",
+        size: "890 KB",
+        type: "Court Order Copy",
+        url: "#"
+      }
+    ],
+    hearingsHistory: [
+      { date: "02/08/2026", stage: "Case Diary Called", summary: "AGA granted 2 weeks to submit latest instructions and case diary." }
+    ],
+    invoices: [],
+    messages: []
+  },
+  {
+    id: "case-rev-11094",
+    caseNumber: "REV/2026/11094",
+    clientName: "Dinesh Kumar Mishra",
+    phone: "+91 9838045612",
+    opposingParty: "Gram Sabha & Others",
+    caseType: "Revenue Court Suit (Sec 144 UP Revenue Code)",
+    courtName: "Board of Revenue & Revenue Courts (Prayagraj)",
+    nextHearingDate: "02/09/2026",
+    judgeBench: "Chairman / Member Board of Revenue",
+    courtRoomNo: "Court No. 03",
+    status: "Hearing in Progress",
+    stage: "Evidence Concluded / Written Arguments",
+    currentStage: "Evidence Concluded / Written Arguments",
+    filingDate: "01/03/2026",
+    assignedAdvocate: "Advocate Bhavni Singh",
+    advocateAssigned: "Advocate Bhavni Singh",
+    statusBadge: "Active",
+    lastOrderRemarks: "Parties directed to submit written arguments on question of ancestral partition and mutation records.",
+    highCourtOrderUrl: "https://vaad.up.nic.in/",
+    documents: [],
+    hearingsHistory: [],
+    invoices: [],
+    messages: []
+  }
+];
 
 export const INITIAL_ENQUIRIES: EnquiryItem[] = [];
 

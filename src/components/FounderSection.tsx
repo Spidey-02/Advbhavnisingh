@@ -24,7 +24,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({ onOpenAppointmen
 
   return (
     <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
         
         {/* Top Banner Headline */}
         <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
@@ -62,7 +62,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({ onOpenAppointmen
                 )}
                 <div className="bg-[#1e293b] p-6 text-white border-t-2 border-[#c5a059]">
                   <p className="text-xl font-serif text-[#c5a059]">{firmDetails.founderName}</p>
-                  <p className="text-xs text-slate-300 font-semibold tracking-wider uppercase mt-1">Founder &amp; Principal Advocate</p>
+                  <p className="text-xs text-slate-300 font-semibold tracking-wider uppercase mt-1">High Court of Judicature at Allahabad</p>
                   <p className="text-xs text-slate-400 mt-1">{firmDetails.enrollmentNo}</p>
                 </div>
               </div>
