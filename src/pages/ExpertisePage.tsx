@@ -85,7 +85,7 @@ export const ExpertisePage: React.FC<ExpertisePageProps> = ({ onOpenAppointmentM
             <div className="bg-[#1e293b] text-white p-6 border-t-2 border-[#c5a059] space-y-3 mt-6">
               <h4 className="text-lg font-serif text-[#c5a059]">Need Urgent Counsel in {selectedArea.title}?</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Schedule a confidential consultation with Advocate Bhavani Singh. We examine case filings, HC daily cause list positioning, and draft effective legal remedies.
+                Schedule a confidential consultation with Advocate Bhavni Singh. We examine case filings, HC daily cause list positioning, and draft effective legal remedies.
               </p>
               <button
                 onClick={onOpenAppointmentModal}

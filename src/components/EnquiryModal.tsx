@@ -40,7 +40,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({ isOpen, onClose }) =
         <div className="mb-6">
           <span className="text-xs font-semibold uppercase tracking-widest text-[#c5a059] block mb-1">Quick Contact</span>
           <h3 className="text-2xl font-serif text-[#1e293b]">Enquiry Now</h3>
-          <p className="text-xs text-slate-500 mt-1">Send a direct message to Bhavani Singh &amp; Associates chambers.</p>
+          <p className="text-xs text-slate-500 mt-1">Send a direct message to Bhavni Singh &amp; Associates chambers.</p>
         </div>
 
         {submitted ? (

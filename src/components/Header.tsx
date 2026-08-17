@@ -36,8 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
-  const waUrl = `https://wa.me/91${cleanWaNumber.length === 10 ? cleanWaNumber : cleanWaNumber}?text=${encodeURIComponent('Hello Advocate Bhavani Singh, I need legal consultation.')}`;
-  const mailtoUrl = `mailto:${firmDetails.email}?subject=${encodeURIComponent('Legal Consultation Request')}&body=${encodeURIComponent('Respected Advocate Bhavani Singh,\n\nI need legal advice regarding...')}`;
+  const waUrl = `https://wa.me/91${cleanWaNumber.length === 10 ? cleanWaNumber : cleanWaNumber}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal consultation.')}`;
+  const mailtoUrl = `mailto:${firmDetails.email}?subject=${encodeURIComponent('Legal Consultation Request')}&body=${encodeURIComponent('Respected Advocate Bhavni Singh,\n\nI need legal advice regarding...')}`;
 
   return (
     <header className="sticky top-0 z-40 w-full shadow-sm bg-white border-b border-slate-200">
@@ -57,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
             <a 
               href={mailtoUrl} 
               className="flex items-center gap-1.5 hover:text-[#c5a059] transition-colors"
-              title="Click to draft email to Advocate Bhavani Singh"
+              title="Click to draft email to Advocate Bhavni Singh"
             >
               <Mail className="w-3.5 h-3.5 text-[#c5a059]" />
               <span>{firmDetails.email}</span>
@@ -199,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest block">Direct Chamber QR Connect</span>
-            <h3 className="text-xl font-serif text-[#1e293b]">Advocate Bhavani WhatsApp</h3>
+            <h3 className="text-xl font-serif text-[#1e293b]">Advocate Bhavni WhatsApp</h3>
             
             <div className="p-3 bg-slate-50 border inline-block">
               <img

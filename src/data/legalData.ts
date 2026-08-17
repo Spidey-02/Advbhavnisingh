@@ -1,14 +1,14 @@
 import { PracticeArea, CaseStudy, BlogPost, Testimonial, OfficeLocation, ClientCase, EnquiryItem } from '../types';
 
 export const FIRM_DETAILS = {
-  name: "BHAVANI SINGH & ASSOCIATES",
+  name: "BHAVNI SINGH & ASSOCIATES",
   tagline: "ADVOCATE — ALLAHABAD HIGH COURT, LOWER COURTS & REVENUE COURTS (PRAYAGRAJ)",
-  founderName: "Advocate Bhavani Singh",
+  founderName: "Advocate Bhavni Singh",
   enrollmentNo: "UP/2022/HCBA (High Court Bar Association Prayagraj)",
   foundedYear: 2022,
   phone: "+91 9415211990",
   altPhone: "+91 9415211991",
-  email: "chambers.bhavanisingh@gmail.com",
+  email: "chambers.bhavnisingh@gmail.com",
   officeHours: "Mon - Sat: 9:00 AM - 8:30 PM",
   mainAddress: "Chamber No. 402, High Court Bar Association Building, Allahabad High Court, Prayagraj (Allahabad), UP - 211001",
   mainOffice: "Plot 14-B, Tashkent Marg, Near Civil Lines Post Office, Prayagraj, UP - 211001",
@@ -51,7 +51,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
       "Revenue & Land Acquisition Writs (UP Revenue Code / Land Ceiling)",
       "Mandamus, Certiorari & Habeas Corpus Petitions"
     ],
-    fullDetails: "Advocate Bhavani Singh has argued hundreds of landmark writ petitions before the Allahabad High Court. We challenge unconstitutional government actions, illegal property seizures, arbitrary service dismissals, and malicious criminal proceedings."
+    fullDetails: "Advocate Bhavni Singh has argued hundreds of landmark writ petitions before the Allahabad High Court. We challenge unconstitutional government actions, illegal property seizures, arbitrary service dismissals, and malicious criminal proceedings."
   },
   {
     id: "criminal-appeal-bail-high-court",
@@ -66,7 +66,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
       "Suspension of Sentence & Interim Release Orders",
       "Gangster Act, NDPS, POCSO & SC/ST Act Special Bail Applications"
     ],
-    fullDetails: "When liberty is threatened, immediate high-court interventions are vital. Advocate Bhavani Singh specializes in swift bail petitions and quashing frivolous criminal proceedings across Uttar Pradesh."
+    fullDetails: "When liberty is threatened, immediate high-court interventions are vital. Advocate Bhavni Singh specializes in swift bail petitions and quashing frivolous criminal proceedings across Uttar Pradesh."
   },
   {
     id: "revenue-land-disputes",
@@ -111,7 +111,7 @@ export const PRACTICE_AREAS: PracticeArea[] = [
       "Pension, Gratuity & GPF Withholding Recovery",
       "Departmental Inquiry Defense & Show Cause Answers"
     ],
-    fullDetails: "Advocate Bhavani Singh routinely represents government servants across UP against adverse entry orders, wrongful suspensions, and pension delays."
+    fullDetails: "Advocate Bhavni Singh routinely represents government servants across UP against adverse entry orders, wrongful suspensions, and pension delays."
   },
   {
     id: "supreme-court-appeals-slp",
@@ -139,7 +139,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     year: "2025",
     summary: "Successfully secured a favorable judgment in Writ-C No. 18294/2024 quashing a state revenue acquisition order without compensation.",
     challenge: "District authorities had re-classified ancestral agricultural land as state reserve without issuing statutory notice under UP Revenue Code.",
-    strategy: "Advocate Bhavani Singh filed an urgent Writ Petition (Civil) under Article 226, demonstrating non-compliance with principles of natural justice and Constitutional Article 300A.",
+    strategy: "Advocate Bhavni Singh filed an urgent Writ Petition (Civil) under Article 226, demonstrating non-compliance with principles of natural justice and Constitutional Article 300A.",
     verdictOutcome: "High Court Division Bench quashed the revenue order, restored possession to farmers, and levied costs on state officers.",
     impact: "Saved agricultural livelihoods of 14 farming families in Prayagraj region.",
     category: "writ",
@@ -180,7 +180,7 @@ export const BLOG_POSTS: BlogPost[] = [
     id: "blog-hc-01",
     title: "How to Check Allahabad High Court Case Status & Order Sheets Online (Step-by-Step Guide)",
     category: "High Court Procedure",
-    author: "Adv. Bhavani Singh",
+    author: "Adv. Bhavni Singh",
     authorRole: "Senior Advocate & Founder",
     date: "Aug 05, 2026",
     readTime: "5 min read",
@@ -195,15 +195,15 @@ export const BLOG_POSTS: BlogPost[] = [
 2. **Party Name Search**: Search by Petitioner or Respondent name if you do not know the exact case filing number.
 3. **Downloading Certified Order Sheets**: High Court order sheets signed by the Hon'ble Benches are updated daily after 5:00 PM.
 
-### Client Portal Integration at Bhavani Singh & Associates
-Clients represented by Bhavani Singh & Associates do not need to struggle with complex legal portals. Our client system allows entering your case number to immediately view court dates, judge bench details, and direct one-click order sheet links.`
+### Client Portal Integration at Bhavni Singh & Associates
+Clients represented by Bhavni Singh & Associates do not need to struggle with complex legal portals. Our client system allows entering your case number to immediately view court dates, judge bench details, and direct one-click order sheet links.`
   },
   {
     id: "blog-hc-02",
     title: "Understanding Section 482 CrPC / BNSS Petitions for Quashing Malicious FIRs in UP",
     category: "Criminal Law",
     author: "Legal Research Team",
-    authorRole: "Bhavani Singh & Associates",
+    authorRole: "Bhavni Singh & Associates",
     date: "Jul 28, 2026",
     readTime: "7 min read",
     imageUrl: "https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=800&q=80",
@@ -221,7 +221,7 @@ export const TESTIMONIALS: Testimonial[] = [
     rating: 5,
     location: "Prayagraj, UP",
     caseType: "Writ Petition (Land Dispute)",
-    comment: "Advocate Bhavani Singh Sir fought our ancestral land case in Allahabad High Court with immense dedication. His command over revenue code and writ arguments is unmatched. We got immediate stay order."
+    comment: "Advocate Bhavni Singh Sir fought our ancestral land case in Allahabad High Court with immense dedication. His command over revenue code and writ arguments is unmatched. We got immediate stay order."
   },
   {
     id: "t-hc-2",
@@ -229,7 +229,7 @@ export const TESTIMONIALS: Testimonial[] = [
     rating: 5,
     location: "Prayagraj, UP",
     caseType: "Service Writ & Promotion Matter",
-    comment: "Bhavani Sir got my promotion order restored in High Court within 3 hearings. Very professional chamber team and transparent case updates."
+    comment: "Bhavni Sir got my promotion order restored in High Court within 3 hearings. Very professional chamber team and transparent case updates."
   },
   {
     id: "t-hc-3",
@@ -237,7 +237,7 @@ export const TESTIMONIALS: Testimonial[] = [
     rating: 5,
     location: "Varanasi, UP",
     caseType: "High Court Criminal Appeal & Bail",
-    comment: "When my brother was wrongly framed, Bhavani Singh & Associates filed High Court bail and secured release smoothly. Honest and top advocate in Allahabad."
+    comment: "When my brother was wrongly framed, Bhavni Singh & Associates filed High Court bail and secured release smoothly. Honest and top advocate in Allahabad."
   }
 ];
 
@@ -302,7 +302,7 @@ export const DEMO_CLIENT_CASE: ClientCase = {
   opposingParty: "State of UP",
   currentStage: "Pending Entry",
   nextHearingDate: "TBD",
-  assignedAdvocate: "Advocate Bhavani Singh",
+  assignedAdvocate: "Advocate Bhavni Singh",
   statusBadge: "Active",
   allahabadHcCaseType: "WRIT-C",
   allahabadHcCaseNo: "00000",

@@ -80,7 +80,7 @@ export const ClientPortalPage: React.FC = () => {
 
   const createGoogleCalendarUrl = (c: ClientCase) => {
     const title = encodeURIComponent(`Court Hearing: ${c.caseNumber} - ${c.courtName}`);
-    const details = encodeURIComponent(`Hearing Date for ${c.clientName}.\nCourt: ${c.courtName}\nJudge/Bench: ${c.judgeBench}\nCourtroom: ${c.courtRoomNo}\nStage: ${c.stage}\nLawyer: Advocate Bhavani Singh (+91 9415211990)`);
+    const details = encodeURIComponent(`Hearing Date for ${c.clientName}.\nCourt: ${c.courtName}\nJudge/Bench: ${c.judgeBench}\nCourtroom: ${c.courtRoomNo}\nStage: ${c.stage}\nLawyer: Advocate Bhavni Singh (+91 9415211990)`);
     const location = encodeURIComponent(`${c.courtName}, Prayagraj`);
     
     // Format date YYYYMMDD
@@ -194,7 +194,7 @@ export const ClientPortalPage: React.FC = () => {
                 <AlertCircle className="w-10 h-10 text-amber-600 mx-auto" />
                 <h3 className="text-xl font-serif text-amber-900">No Matching Case Records Found</h3>
                 <p className="text-xs text-amber-800 leading-relaxed">
-                  We could not find any case matching <strong>&quot;{searchQuery}&quot;</strong>. Please check your filing number, or contact Advocate Bhavani Singh&apos;s chamber at <strong>+91 9415211990</strong> for immediate assistance.
+                  We could not find any case matching <strong>&quot;{searchQuery}&quot;</strong>. Please check your filing number, or contact Advocate Bhavni Singh&apos;s chamber at <strong>+91 9415211990</strong> for immediate assistance.
                 </p>
                 <div className="pt-2">
                   <a
@@ -339,7 +339,7 @@ export const ClientPortalPage: React.FC = () => {
                         <div>
                           <span className="text-[10px] font-bold text-[#c5a059] uppercase tracking-widest block">Official High Court Document</span>
                           <h4 className="text-lg font-serif text-white">Court Order &amp; Judgment Copy</h4>
-                          <p className="text-xs text-slate-300 mt-0.5">Uploaded &amp; Certified by Advocate Bhavani Singh</p>
+                          <p className="text-xs text-slate-300 mt-0.5">Uploaded &amp; Certified by Advocate Bhavni Singh</p>
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">

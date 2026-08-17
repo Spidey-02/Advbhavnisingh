@@ -124,7 +124,7 @@ export const CourtCaseTrackerSection: React.FC = () => {
             Prayagraj Courts Online Portal Redirection
           </h2>
           <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-            Advocate Bhavani Singh represents clients across <strong className="text-white">Allahabad High Court</strong>, <strong className="text-white">District &amp; Lower Courts</strong>, and <strong className="text-white">Board of Revenue Courts</strong> in Prayagraj. Use our direct links to access official court portals for daily cause lists, judge bench allocations, and order sheets.
+            Advocate Bhavni Singh represents clients across <strong className="text-white">Allahabad High Court</strong>, <strong className="text-white">District &amp; Lower Courts</strong>, and <strong className="text-white">Board of Revenue Courts</strong> in Prayagraj. Use our direct links to access official court portals for daily cause lists, judge bench allocations, and order sheets.
           </p>
         </div>
 

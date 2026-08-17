@@ -17,14 +17,14 @@ export const WhatsAppConnectWidget: React.FC<WhatsAppConnectWidgetProps> = ({ co
   const formattedWaNumber = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
   const whatsappUrl = `https://wa.me/${formattedWaNumber}?text=${encodeURIComponent(
-    `Hello Advocate Bhavani Singh, I need legal consultation regarding an Allahabad High Court matter.`
+    `Hello Advocate Bhavni Singh, I need legal consultation regarding an Allahabad High Court matter.`
   )}`;
 
   const qrCodeImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(whatsappUrl)}&color=1e293b&bgcolor=ffffff`;
 
   const emailSubject = encodeURIComponent("Legal Consultation Request — Allahabad High Court Chambers");
   const emailBody = encodeURIComponent(
-    `Respected Advocate Bhavani Singh,\n\nI am reaching out regarding a legal consultation/representation.\n\nMy Details:\n- Name: \n- Phone: \n- District / City: \n- Matter / Case Type (Writ / Bail / Revenue / Civil / Family / Service): \n\nBrief Summary:\n\nThank you.`
+    `Respected Advocate Bhavni Singh,\n\nI am reaching out regarding a legal consultation/representation.\n\nMy Details:\n- Name: \n- Phone: \n- District / City: \n- Matter / Case Type (Writ / Bail / Revenue / Civil / Family / Service): \n\nBrief Summary:\n\nThank you.`
   );
   const mailtoUrl = `mailto:${firmDetails.email}?subject=${emailSubject}&body=${emailBody}`;
 
@@ -52,12 +52,12 @@ export const WhatsAppConnectWidget: React.FC<WhatsAppConnectWidgetProps> = ({ co
         <div className="flex items-center gap-3">
           <img
             src={qrCodeImgUrl}
-            alt="WhatsApp QR Code Advocate Bhavani Singh"
+            alt="WhatsApp QR Code Advocate Bhavni Singh"
             className="w-20 h-20 bg-white p-1 border border-slate-700 shrink-0"
           />
           <div className="space-y-1 text-xs">
             <p className="font-serif text-white font-bold">Direct Scan to WhatsApp</p>
-            <p className="text-[11px] text-slate-300">Scan QR Code with phone camera to start direct chat with Advocate Bhavani Singh.</p>
+            <p className="text-[11px] text-slate-300">Scan QR Code with phone camera to start direct chat with Advocate Bhavni Singh.</p>
             <a
               href={whatsappUrl}
               target="_blank"
@@ -83,7 +83,7 @@ export const WhatsAppConnectWidget: React.FC<WhatsAppConnectWidgetProps> = ({ co
             Direct Connect &amp; Instant Action Portal
           </span>
           <h3 className="text-xl sm:text-2xl font-serif text-white mt-1">
-            Connect with Advocate Bhavani Singh
+            Connect with Advocate Bhavni Singh
           </h3>
           <p className="text-xs text-slate-400">
             Scan WhatsApp QR Code or click direct call &amp; drafted email triggers for instant legal response.
@@ -103,7 +103,7 @@ export const WhatsAppConnectWidget: React.FC<WhatsAppConnectWidgetProps> = ({ co
           <div className="inline-block p-2 bg-slate-50 border border-slate-200">
             <img
               src={qrCodeImgUrl}
-              alt="Advocate Bhavani Singh WhatsApp QR Code"
+              alt="Advocate Bhavni Singh WhatsApp QR Code"
               className="w-40 h-40 mx-auto object-contain"
             />
           </div>
@@ -112,7 +112,7 @@ export const WhatsAppConnectWidget: React.FC<WhatsAppConnectWidgetProps> = ({ co
               Scan QR Code with Mobile Camera
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Instantly opens WhatsApp chat with Advocate Bhavani Singh
+              Instantly opens WhatsApp chat with Advocate Bhavni Singh
             </p>
           </div>
           <a

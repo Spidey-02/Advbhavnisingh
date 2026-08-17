@@ -1,5 +1,5 @@
 type: web
-name: bhavani-singh-associates
+name: bhavni-singh-associates
 env: node
 region: singapore
 plan: free
@@ -11,7 +11,7 @@ envVars:
   - key: NPM_CONFIG_PRODUCTION
     value: "false"
   - key: MONGODB_DB_NAME
-    value: "bhavani_law_firm"
+    value: "bhavni_law_firm"
   - key: MONGODB_URI
     sync: false
   - key: GEMINI_API_KEY

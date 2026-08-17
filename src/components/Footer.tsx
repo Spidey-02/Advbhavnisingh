@@ -17,8 +17,8 @@ export const Footer: React.FC<FooterProps> = ({
 
   const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
   const formattedWa = cleanWaNumber.length === 10 ? `91${cleanWaNumber}` : cleanWaNumber;
-  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavani Singh, I need legal guidance.')}`;
-  const mailtoUrl = `mailto:${firmDetails.email}?subject=${encodeURIComponent('High Court Legal Consultation')}&body=${encodeURIComponent('Respected Advocate Bhavani Singh,\n\nI wish to consult regarding...')}`;
+  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal guidance.')}`;
+  const mailtoUrl = `mailto:${firmDetails.email}?subject=${encodeURIComponent('High Court Legal Consultation')}&body=${encodeURIComponent('Respected Advocate Bhavni Singh,\n\nI wish to consult regarding...')}`;
 
   return (
     <footer className="bg-[#1e293b] text-slate-300 pt-16 pb-8 border-t border-slate-800">
@@ -132,11 +132,11 @@ export const Footer: React.FC<FooterProps> = ({
             <span className="text-[10px] font-bold uppercase text-[#c5a059] tracking-widest flex items-center justify-center gap-1">
               <QrCode className="w-3.5 h-3.5" /> WhatsApp QR Code
             </span>
-            <p className="text-[11px] text-slate-400">Scan to chat directly with Advocate Bhavani Singh</p>
+            <p className="text-[11px] text-slate-400">Scan to chat directly with Advocate Bhavni Singh</p>
             <div className="p-2 bg-white inline-block">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(waUrl)}`}
-                alt="Advocate Bhavani Singh QR"
+                alt="Advocate Bhavni Singh QR"
                 className="w-28 h-28 mx-auto"
               />
             </div>
@@ -160,7 +160,7 @@ export const Footer: React.FC<FooterProps> = ({
               BCI Disclaimer &amp; Terms
             </button>
             <span>&bull;</span>
-            <button onClick={() => onNavigate('advocate-portal')} className="flex items-center gap-1 text-slate-600 hover:text-[#c5a059] text-[11px] font-mono cursor-pointer transition-colors" title="Advocate Bhavani Singh - Confidential Chamber Portal">
+            <button onClick={() => onNavigate('advocate-portal')} className="flex items-center gap-1 text-slate-600 hover:text-[#c5a059] text-[11px] font-mono cursor-pointer transition-colors" title="Advocate Bhavni Singh - Confidential Chamber Portal">
               <Lock className="w-3 h-3 text-slate-500" /> Chamber Admin
             </button>
           </div>

@@ -33,16 +33,16 @@ export const ContactPage: React.FC = () => {
       submittedAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       status: 'New'
     };
-    localStorage.setItem('bhavani_enquiries', JSON.stringify([newQuery, ...existingQueries]));
+    localStorage.setItem('bhavni_enquiries', JSON.stringify([newQuery, ...existingQueries]));
   };
 
   const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
   const formattedWa = cleanWaNumber.length === 10 ? `91${cleanWaNumber}` : cleanWaNumber;
-  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavani Singh, I need legal consultation.')}`;
+  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal consultation.')}`;
 
   const emailSubject = encodeURIComponent("Legal Consultation Request — High Court Chambers");
   const emailBody = encodeURIComponent(
-    `Respected Advocate Bhavani Singh,\n\nI wish to request a legal consultation regarding my matter.\n\nName:\nPhone:\nCase Type:\nBrief Details:\n\nThank you.`
+    `Respected Advocate Bhavni Singh,\n\nI wish to request a legal consultation regarding my matter.\n\nName:\nPhone:\nCase Type:\nBrief Details:\n\nThank you.`
   );
   const mailtoUrl = `mailto:${firmDetails.email}?subject=${emailSubject}&body=${emailBody}`;
 
@@ -69,9 +69,9 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-7 bg-white p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
             <div className="border-b border-slate-100 pb-4">
               <span className="text-xs font-bold uppercase tracking-wider text-[#c5a059]">Direct Case Query Submission</span>
-              <h2 className="text-2xl font-serif text-[#1e293b]">Send Legal Enquiry to Advocate Bhavani Singh</h2>
+              <h2 className="text-2xl font-serif text-[#1e293b]">Send Legal Enquiry to Advocate Bhavni Singh</h2>
               <p className="text-xs text-slate-500 mt-1">
-                Your enquiry is transmitted securely to Advocate Bhavani Singh&apos;s personal dashboard.
+                Your enquiry is transmitted securely to Advocate Bhavni Singh&apos;s personal dashboard.
               </p>
             </div>
 

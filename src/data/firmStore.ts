@@ -46,17 +46,17 @@ export interface FirmDetailsType {
 }
 
 const STORAGE_KEYS = {
-  DETAILS: 'bhavani_firm_details',
-  LOCATIONS: 'bhavani_office_locations',
-  BLOGS: 'bhavani_blog_posts',
-  CASE_STUDIES: 'bhavani_case_studies',
+  DETAILS: 'bhavni_firm_details',
+  LOCATIONS: 'bhavni_office_locations',
+  BLOGS: 'bhavni_blog_posts',
+  CASE_STUDIES: 'bhavni_case_studies',
 };
 
 export const DEFAULT_FIRM_DETAILS: FirmDetailsType = {
   ...FIRM_DETAILS,
   whatsapp: FIRM_DETAILS.phone,
   founderImage: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
-  aboutText: "Practicing since 2022, Advocate Bhavani Singh & Associates is a dynamic and deeply knowledgeable law firm practicing actively before the Hon'ble High Court of Judicature at Allahabad, District & Lower Courts (Prayagraj), and Board of Revenue & Revenue Courts (Prayagraj). Known for relentless hard work, exhaustive legal research, and sharp court craftsmanship, Advocate Bhavani Singh represents clients in Constitutional Writs, Criminal Bail & Trials, Section 482 Quashing Petitions, and Revenue & Land Disputes."
+  aboutText: "Practicing since 2022, Advocate Bhavni Singh & Associates is a dynamic and deeply knowledgeable law firm practicing actively before the Hon'ble High Court of Judicature at Allahabad, District & Lower Courts (Prayagraj), and Board of Revenue & Revenue Courts (Prayagraj). Known for relentless hard work, exhaustive legal research, and sharp court craftsmanship, Advocate Bhavni Singh represents clients in Constitutional Writs, Criminal Bail & Trials, Section 482 Quashing Petitions, and Revenue & Land Disputes."
 };
 
 // Getter functions

@@ -18,7 +18,7 @@ async function getMongoDB() {
       await mongoClient.connect();
       console.log("Connected successfully to MongoDB Atlas database");
     }
-    return mongoClient.db(process.env.MONGODB_DB_NAME || "bhavani_law_firm");
+    return mongoClient.db(process.env.MONGODB_DB_NAME || "bhavni_law_firm");
   } catch (err) {
     console.error("MongoDB Atlas connection error:", err);
     return null;
@@ -27,7 +27,7 @@ async function getMongoDB() {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
   // Body parser with 10mb limit for PDF order copies & profile photos
   app.use(express.json({ limit: "10mb" }));
@@ -47,7 +47,7 @@ async function startServer() {
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "ok",
-      firm: "Bhavani Singh & Associates",
+      firm: "Bhavni Singh & Associates",
       mongodbConfigured: Boolean(process.env.MONGODB_URI)
     });
   });
@@ -58,7 +58,7 @@ async function startServer() {
     return res.json({
       configured: Boolean(process.env.MONGODB_URI),
       connected: Boolean(db),
-      databaseName: process.env.MONGODB_DB_NAME || "bhavani_law_firm"
+      databaseName: process.env.MONGODB_DB_NAME || "bhavni_law_firm"
     });
   });
 
@@ -180,17 +180,17 @@ async function startServer() {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
         return res.json({
-          reply: `Thank you for your legal inquiry regarding "${practiceArea || "Legal Matters"}". Advocate Bhavani Singh & Associates provides expert legal counsel and trial advocacy at Allahabad High Court (Prayagraj), District Courts, and Board of Revenue. Please book an official appointment via our portal or contact us directly at +91 9415211990 or chambers.bhavanisingh@gmail.com for personalized legal counsel.`,
+          reply: `Thank you for your legal inquiry regarding "${practiceArea || "Legal Matters"}". Advocate Bhavni Singh & Associates provides expert legal counsel and trial advocacy at Allahabad High Court (Prayagraj), District Courts, and Board of Revenue. Please book an official appointment via our portal or contact us directly at +91 9415211990 or chambers.bhavnisingh@gmail.com for personalized legal counsel.`,
           isFallback: true
         });
       }
 
       const ai = new GoogleGenAI({ apiKey });
-      const prompt = `You are an AI legal consultation assistant for 'Bhavani Singh & Associates Advocates & Legal Consultants', a premier Indian law firm led by Senior Advocate Bhavani Singh practicing at the Hon'ble High Court of Judicature at Allahabad (Prayagraj Bench), Board of Revenue, and District Courts.
+      const prompt = `You are an AI legal consultation assistant for 'Bhavni Singh & Associates Advocates & Legal Consultants', a premier Indian law firm led by Senior Advocate Bhavni Singh practicing at the Hon'ble High Court of Judicature at Allahabad (Prayagraj Bench), Board of Revenue, and District Courts.
 The user is asking a legal question: "${query}" in the category of "${practiceArea || "General Legal Counsel"}".
 Provide a helpful, well-structured, professional legal summary based on Indian statutes and High Court/Supreme Court precedents (e.g., Bharatiya Nyaya Sanhita, IPC, CrPC, CPC, Constitution of India Writ Jurisdiction, Civil & Criminal Writs, Land Laws, Service Matters, Hindu Marriage Act, NI Act, etc.).
 Keep your response professional, reassuring, and concise (3 short paragraphs or bullet points).
-Conclude with a clear reminder that this is for preliminary information only and encourage booking a formal consultation with Advocate Bhavani Singh & Associates at +91 9415211990.`;
+Conclude with a clear reminder that this is for preliminary information only and encourage booking a formal consultation with Advocate Bhavni Singh & Associates at +91 9415211990.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -202,7 +202,7 @@ Conclude with a clear reminder that this is for preliminary information only and
     } catch (err: any) {
       console.error("Gemini API Error:", err);
       return res.status(500).json({
-        reply: "Thank you for your inquiry. Our legal team at Bhavani Singh & Associates is ready to assist you. Please book an appointment or call +91 9415211990 for immediate guidance.",
+        reply: "Thank you for your inquiry. Our legal team at Bhavni Singh & Associates is ready to assist you. Please book an appointment or call +91 9415211990 for immediate guidance.",
         error: err.message
       });
     }

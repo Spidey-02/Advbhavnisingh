@@ -18,14 +18,17 @@ import { AdvocatePortalPage } from './pages/AdvocatePortalPage';
 
 export function App() {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState<boolean>(() => {
-    return localStorage.getItem('bhavani_disclaimer_accepted') === 'true';
+    return localStorage.getItem('bhavni_disclaimer_accepted') === 'true';
   });
 
   // Current page path route (defaults to /home)
   const [currentPath, setCurrentPath] = useState<string>(() => {
-    const pathname = window.location.pathname;
-    if (pathname && pathname !== '/') {
-      return pathname;
+    let p = window.location.pathname.toLowerCase().trim();
+    if (p.length > 1 && p.endsWith('/')) {
+      p = p.slice(0, -1);
+    }
+    if (p && p !== '/') {
+      return p;
     }
     return '/home';
   });
@@ -35,7 +38,10 @@ export function App() {
   useEffect(() => {
     // Listen to browser back/forward buttons
     const handlePopState = () => {
-      const p = window.location.pathname;
+      let p = window.location.pathname.toLowerCase().trim();
+      if (p.length > 1 && p.endsWith('/')) {
+        p = p.slice(0, -1);
+      }
       if (p && p !== '/') {
         setCurrentPath(p);
       } else {
@@ -48,14 +54,18 @@ export function App() {
   }, []);
 
   const handleNavigate = (path: string) => {
-    setCurrentPath(path);
+    let normalized = path.toLowerCase().trim();
+    if (normalized.length > 1 && normalized.endsWith('/')) {
+      normalized = normalized.slice(0, -1);
+    }
+    setCurrentPath(normalized);
     window.history.pushState({}, '', path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAcceptDisclaimer = () => {
     setDisclaimerAccepted(true);
-    localStorage.setItem('bhavani_disclaimer_accepted', 'true');
+    localStorage.setItem('bhavni_disclaimer_accepted', 'true');
   };
 
   const renderPage = () => {

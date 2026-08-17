@@ -176,7 +176,7 @@ export const AdvocatePortalPage: React.FC = () => {
   const [newBlog, setNewBlog] = useState({
     title: '',
     category: 'High Court Writs',
-    author: 'Advocate Bhavani Singh',
+    author: 'Advocate Bhavni Singh',
     authorRole: 'Senior Advocate — Allahabad High Court',
     readTime: '5 min read',
     imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
@@ -388,7 +388,7 @@ export const AdvocatePortalPage: React.FC = () => {
       status: newCase.status,
       stage: newCase.stage,
       filingDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      advocateAssigned: firmProfile.founderName || 'Advocate Bhavani Singh',
+      advocateAssigned: firmProfile.founderName || 'Advocate Bhavni Singh',
       lastOrderRemarks: newCase.lastOrderRemarks,
       highCourtOrderUrl: newCaseOrderFile ? newCaseOrderFile.url : newCase.highCourtOrderUrl,
       documents: newCaseOrderFile ? [
@@ -580,7 +580,7 @@ export const AdvocatePortalPage: React.FC = () => {
               <Lock className="w-8 h-8 text-[#c5a059]" />
             </div>
             <span className="text-[10px] font-bold text-[#c5a059] uppercase tracking-widest block">Confidential Legal Administration</span>
-            <h1 className="text-2xl font-serif text-white">Advocate Bhavani Portal</h1>
+            <h1 className="text-2xl font-serif text-white">Advocate Bhavni Portal</h1>
             <p className="text-xs text-slate-400">High Court, Lower Courts &amp; Revenue Courts Chambers &bull; Prayagraj</p>
           </div>
 

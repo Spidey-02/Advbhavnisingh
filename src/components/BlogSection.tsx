@@ -27,7 +27,7 @@ export const BlogSection: React.FC = () => {
 
     setTimeout(() => {
       setAiSummary(
-        `AI Summary: "${post.title}" highlights key legal considerations under Indian Law. Advocate Bhavani Singh advises strict adherence to statutory timelines, filing comprehensive supporting affidavits, and seeking pre-litigation mediation where applicable to protect personal and financial rights.`
+        `AI Summary: "${post.title}" highlights key legal considerations under Indian Law. Advocate Bhavni Singh advises strict adherence to statutory timelines, filing comprehensive supporting affidavits, and seeking pre-litigation mediation where applicable to protect personal and financial rights.`
       );
       setGeneratingSummary(false);
     }, 1000);

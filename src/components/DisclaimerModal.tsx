@@ -54,7 +54,7 @@ export const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, onAcce
           </p>
 
           <p>
-            If you wish to get more information about us or would like to get in touch with <strong>Bhavani Singh &amp; Associates</strong>, you may contact us on our registered email address: <a href="mailto:chambers.bhavanisingh@gmail.com" className="text-[#c5a059] underline font-medium">chambers.bhavanisingh@gmail.com</a>.
+            If you wish to get more information about us or would like to get in touch with <strong>Bhavni Singh &amp; Associates</strong>, you may contact us on our registered email address: <a href="mailto:chambers.bhavnisingh@gmail.com" className="text-[#c5a059] underline font-medium">chambers.bhavnisingh@gmail.com</a>.
           </p>
 
           <div className="space-y-2.5 pt-2">

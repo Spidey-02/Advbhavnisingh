@@ -228,7 +228,7 @@ export const ClientPortal: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2">
                     <h4 className="text-base font-serif text-white">Case Document Vault</h4>
-                    <span className="text-xs text-slate-400">Official Orders &amp; Judgments Uploaded by Advocate Bhavani</span>
+                    <span className="text-xs text-slate-400">Official Orders &amp; Judgments Uploaded by Advocate Bhavni</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {caseData.documents.map((doc, idx) => (
@@ -331,7 +331,7 @@ export const ClientPortal: React.FC = () => {
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type confidential note to Advocate Bhavani Singh..."
+                      placeholder="Type confidential note to Advocate Bhavni Singh..."
                       className="flex-1 px-4 py-2.5 bg-slate-950 border border-slate-800 text-sm text-slate-100 focus:outline-none focus:border-[#c5a059]"
                     />
                     <button

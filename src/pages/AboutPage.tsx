@@ -27,11 +27,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenAppointm
             <div className="relative w-full max-w-md border border-slate-300 p-2 bg-slate-50">
               <img 
                 src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80" 
-                alt="Advocate Bhavani Singh" 
+                alt="Advocate Bhavni Singh" 
                 className="w-full h-[400px] object-cover object-top"
               />
               <div className="bg-[#1e293b] p-4 text-center text-white mt-2">
-                <h3 className="text-xl font-serif text-[#c5a059]">Advocate Bhavani Singh</h3>
+                <h3 className="text-xl font-serif text-[#c5a059]">Advocate Bhavni Singh</h3>
                 <p className="text-xs text-slate-300 font-semibold">{FIRM_DETAILS.enrollmentNo}</p>
                 <p className="text-[11px] text-slate-400 mt-1">Founder &amp; Principal Advocate</p>
               </div>
@@ -42,7 +42,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenAppointm
             <span className="text-xs font-bold text-[#c5a059] uppercase tracking-widest block">Dedicated Trial &amp; Appellate Advocate</span>
             <h2 className="text-2xl sm:text-3xl font-serif text-[#1e293b]">Dynamic Legal Practice &amp; Appellate Advocacy in Uttar Pradesh</h2>
             <p className="text-sm leading-relaxed text-slate-600">
-              Advocate Bhavani Singh has been practicing law actively since <strong>2022</strong> before the Hon&apos;ble High Court of Judicature at Allahabad, District &amp; Sessions Court (Prayagraj), and Board of Revenue &amp; Revenue Courts (Prayagraj). Known for relentless hard work, meticulous case research, and sharp court craftsmanship, Advocate Bhavani Singh has represented over 1,500 clients in high-stakes Constitutional Writs, Section 482 FIR Quashing Petitions, High Court Bail Applications, Lower Court Criminal &amp; Civil Trials, and Revenue Land Disputes.
+              Advocate Bhavni Singh has been practicing law actively since <strong>2022</strong> before the Hon&apos;ble High Court of Judicature at Allahabad, District &amp; Sessions Court (Prayagraj), and Board of Revenue &amp; Revenue Courts (Prayagraj). Known for relentless hard work, meticulous case research, and sharp court craftsmanship, Advocate Bhavni Singh has represented over 1,500 clients in high-stakes Constitutional Writs, Section 482 FIR Quashing Petitions, High Court Bail Applications, Lower Court Criminal &amp; Civil Trials, and Revenue Land Disputes.
             </p>
 
             <div className="bg-slate-50 p-4 border-l-4 border-[#c5a059] space-y-2">

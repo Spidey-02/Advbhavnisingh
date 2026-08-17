@@ -33,7 +33,7 @@ export const CaseStudyGallery: React.FC<CaseStudyGalleryProps> = ({ onBookConsul
             Case Study Gallery
           </h2>
           <p className="text-slate-600 text-sm sm:text-base">
-            Explore detailed breakdowns of litigation victories, strategic court settlements, and landmark appeals handled by Advocate Bhavani Singh &amp; Associates.
+            Explore detailed breakdowns of litigation victories, strategic court settlements, and landmark appeals handled by Advocate Bhavni Singh &amp; Associates.
           </p>
         </div>
 

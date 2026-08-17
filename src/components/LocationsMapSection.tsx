@@ -27,7 +27,7 @@ export const LocationsMapSection: React.FC = () => {
             Visit Our Chambers
           </h2>
           <p className="text-slate-600 text-sm sm:text-base">
-            Advocate Bhavani Singh maintains strategic chambers at the Allahabad High Court, District &amp; Lower Courts, and Board of Revenue Courts in Prayagraj.
+            Advocate Bhavni Singh maintains strategic chambers at the Allahabad High Court, District &amp; Lower Courts, and Board of Revenue Courts in Prayagraj.
           </p>
         </div>
 

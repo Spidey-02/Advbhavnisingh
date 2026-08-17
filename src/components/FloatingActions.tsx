@@ -14,7 +14,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
 
   const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
   const formattedWa = cleanWaNumber.length === 10 ? `91${cleanWaNumber}` : cleanWaNumber;
-  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavani Singh, I need legal guidance.')}`;
+  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal guidance.')}`;
 
   return (
     <>
@@ -46,8 +46,8 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
         <a
           href={`tel:${firmDetails.phone}`}
           className="pointer-events-auto w-12 h-12 rounded-full bg-[#1e293b] hover:bg-[#c5a059] text-white border-2 border-[#c5a059] flex items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer"
-          aria-label={`Call Advocate Bhavani Singh at ${firmDetails.phone}`}
-          title={`Call Advocate Bhavani Singh at ${firmDetails.phone}`}
+          aria-label={`Call Advocate Bhavni Singh at ${firmDetails.phone}`}
+          title={`Call Advocate Bhavni Singh at ${firmDetails.phone}`}
         >
           <Phone className="w-5 h-5 text-[#c5a059] hover:text-white" />
         </a>

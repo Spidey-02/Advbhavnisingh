@@ -66,7 +66,7 @@ export const AppointmentSection: React.FC<AppointmentSectionProps> = ({
                     Consultation Requested!
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
-                    Thank you <strong>{formData.name}</strong>. Your consultation request for <strong>{formData.practiceArea}</strong> on <strong>{formData.date} at {formData.timeSlot}</strong> ({formData.mode}) has been routed to Advocate Bhavani Singh&apos;s chamber desk. Our office manager will call you at <strong>{formData.phone}</strong> shortly to confirm.
+                    Thank you <strong>{formData.name}</strong>. Your consultation request for <strong>{formData.practiceArea}</strong> on <strong>{formData.date} at {formData.timeSlot}</strong> ({formData.mode}) has been routed to Advocate Bhavni Singh&apos;s chamber desk. Our office manager will call you at <strong>{formData.phone}</strong> shortly to confirm.
                   </p>
                   <div className="pt-2">
                     <button
@@ -256,7 +256,7 @@ export const AppointmentSection: React.FC<AppointmentSectionProps> = ({
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] via-[#1e293b]/50 to-transparent p-8 flex flex-col justify-end text-white border-t-2 border-[#c5a059]">
-                <p className="text-2xl font-serif text-[#c5a059]">Bhavani Singh &amp; Associates</p>
+                <p className="text-2xl font-serif text-[#c5a059]">Bhavni Singh &amp; Associates</p>
                 <p className="text-xs text-slate-300 font-semibold tracking-wider uppercase mt-1">High Court, Lower Courts &amp; Revenue Courts Chambers &bull; Prayagraj</p>
                 <p className="text-xs text-slate-400 mt-2">Direct Mob: +91 9415211990 | Email: chambers.bhavanisingh@gmail.com</p>
               </div>
