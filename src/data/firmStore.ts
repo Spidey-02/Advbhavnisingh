@@ -279,6 +279,49 @@ export const saveHeroSlides = (heroSlides: HeroSlide[]) => {
   notifyFirmDataChanged();
 };
 
+export interface AdvocateCreds {
+  name: string;
+  mobile: string;
+  email: string;
+  userId: string;
+  password: string;
+  secretCode: string;
+}
+
+export const getStoredAdvocateCreds = (): AdvocateCreds => {
+  try {
+    const saved = localStorage.getItem('bhavani_advocate_creds');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.userId && parsed.password) {
+        return {
+          name: parsed.name || 'Advocate Bhavni Singh',
+          mobile: parsed.mobile || '+91 9415211990',
+          email: parsed.email || 'advprakhargupta.211@gmail.com',
+          userId: parsed.userId,
+          password: parsed.password,
+          secretCode: parsed.secretCode || '9900'
+        };
+      }
+    }
+  } catch (e) {
+    console.error('Error reading advocate creds', e);
+  }
+  return {
+    name: 'Advocate Bhavni Singh',
+    mobile: '+91 9415211990',
+    email: 'advprakhargupta.211@gmail.com',
+    userId: 'bhavani.singh',
+    password: 'password123',
+    secretCode: '9900'
+  };
+};
+
+export const saveAdvocateCreds = (creds: AdvocateCreds) => {
+  localStorage.setItem('bhavani_advocate_creds', JSON.stringify(creds));
+  notifyFirmDataChanged();
+};
+
 export const saveClients = (clients: ClientProfile[]) => {
   localStorage.setItem(STORAGE_KEYS.CLIENTS, JSON.stringify(clients));
   notifyFirmDataChanged();

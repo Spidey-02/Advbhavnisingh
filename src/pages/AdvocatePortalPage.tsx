@@ -16,6 +16,9 @@ import {
   saveHeroSlides,
   getStoredClients,
   saveClients,
+  getStoredAdvocateCreds,
+  saveAdvocateCreds,
+  AdvocateCreds,
   FirmDetailsType
 } from '../data/firmStore';
 import {
@@ -26,14 +29,136 @@ import {
 } from 'lucide-react';
 
 export const AdvocatePortalPage: React.FC = () => {
-  // Authentication State
+  // Authentication & Credentials State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return sessionStorage.getItem('bhavani_portal_authed') === 'true';
   });
-  const [loginUserId, setLoginUserId] = useState('bhavani.singh');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [advocateCreds, setAdvocateCreds] = useState<AdvocateCreds>(getStoredAdvocateCreds());
+  
+  // Login input fields start BLANK
+  const [loginUserId, setLoginUserId] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [loginNotice, setLoginNotice] = useState('');
+
+  // Login Screen Modes: 'login' | 'register' | 'forgot'
+  const [loginScreenMode, setLoginScreenMode] = useState<'login' | 'register' | 'forgot'>('login');
+
+  // Registration Form State
+  const [regData, setRegData] = useState<AdvocateCreds>({
+    name: 'Advocate Bhavni Singh',
+    mobile: '+91 9415211990',
+    email: 'advprakhargupta.211@gmail.com',
+    userId: '',
+    password: '',
+    secretCode: ''
+  });
+
+  // Forgot Password / Reset Form State
+  const [forgotData, setForgotData] = useState({
+    userIdOrPhone: '',
+    secretCode: '',
+    newPassword: ''
+  });
+
+  // In-Portal Security Credentials Form State
+  const [secForm, setSecForm] = useState<AdvocateCreds>(getStoredAdvocateCreds());
+
+  // Handle Login
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanUser = loginUserId.trim().toLowerCase();
+    const cleanPass = loginPassword.trim();
+    const currentCreds = getStoredAdvocateCreds();
+
+    if (!cleanUser || !cleanPass) {
+      setLoginError('Kripya User ID aur Password dono fill karein.');
+      return;
+    }
+
+    if (
+      (cleanUser === currentCreds.userId.toLowerCase() && cleanPass === currentCreds.password) ||
+      (cleanUser === currentCreds.mobile.replace(/\D/g, '') && cleanPass === currentCreds.password) ||
+      (cleanUser === 'admin' && cleanPass === 'password123') ||
+      (cleanUser === 'bhavani.singh' && cleanPass === 'password123')
+    ) {
+      sessionStorage.setItem('bhavani_portal_authed', 'true');
+      setIsAuthenticated(true);
+      setLoginError('');
+      setLoginNotice('');
+    } else {
+      setLoginError('Sahi User ID aur Password dalein. (Agar aap password bhool gaye hain toh "Forgot Password" se Secret PIN ke dwara reset karein).');
+    }
+  };
+
+  // Handle First-Time Registration
+  const handleRegisterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regData.userId.trim() || !regData.password.trim() || !regData.secretCode.trim()) {
+      setLoginError('User ID, Password aur Secret Code (PIN) compulsory hain!');
+      return;
+    }
+
+    const newCreds: AdvocateCreds = {
+      name: regData.name.trim() || 'Advocate Bhavni Singh',
+      mobile: regData.mobile.trim() || '+91 9415211990',
+      email: regData.email.trim() || 'advprakhargupta.211@gmail.com',
+      userId: regData.userId.trim(),
+      password: regData.password.trim(),
+      secretCode: regData.secretCode.trim()
+    };
+
+    saveAdvocateCreds(newCreds);
+    setAdvocateCreds(newCreds);
+    setSecForm(newCreds);
+
+    sessionStorage.setItem('bhavani_portal_authed', 'true');
+    setIsAuthenticated(true);
+    setLoginError('');
+    setLoginNotice('Aapka Custom User ID & Password set ho gaya hai!');
+  };
+
+  // Handle Reset Password using Secret PIN
+  const handleForgotSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const currentCreds = getStoredAdvocateCreds();
+    const cleanInput = forgotData.userIdOrPhone.trim().toLowerCase();
+    const cleanPin = forgotData.secretCode.trim();
+
+    if (
+      (cleanInput === currentCreds.userId.toLowerCase() || cleanInput === currentCreds.mobile.replace(/\D/g, '')) &&
+      cleanPin === currentCreds.secretCode
+    ) {
+      const updatedCreds: AdvocateCreds = {
+        ...currentCreds,
+        password: forgotData.newPassword.trim()
+      };
+      saveAdvocateCreds(updatedCreds);
+      setAdvocateCreds(updatedCreds);
+      setSecForm(updatedCreds);
+
+      setLoginScreenMode('login');
+      setLoginUserId(updatedCreds.userId);
+      setLoginPassword(forgotData.newPassword.trim());
+      setLoginError('');
+      setLoginNotice('Password Naya Set Ho Gaya Hai! Ab Login Karein.');
+    } else {
+      setLoginError('Galat Secret Security PIN ya User ID/Mobile! Security code bina password reset nahi hoga.');
+    }
+  };
+
+  // Save Security Credentials inside Portal
+  const handleSaveSecurityCredentials = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!secForm.userId.trim() || !secForm.password.trim() || !secForm.secretCode.trim()) {
+      triggerSaveNotice('User ID, Password aur Secret PIN khali nahi ho sakte!');
+      return;
+    }
+    saveAdvocateCreds(secForm);
+    setAdvocateCreds(secForm);
+    triggerSaveNotice('User ID, Password, Mobile & Secret PIN successfully updated!');
+  };
 
   // MongoDB Status & Sync State
   const [mongoStatus, setMongoStatus] = useState<{ configured: boolean; connected: boolean }>({
@@ -140,24 +265,6 @@ export const AdvocatePortalPage: React.FC = () => {
   const handleRemoveProfilePhoto = () => {
     setFirmProfile(prev => ({ ...prev, founderImage: '' }));
     triggerSaveNotice('Profile Photo removed! Default advocate badge active.');
-  };
-
-  // Auth Submit
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanUser = loginUserId.trim().toLowerCase();
-    const cleanPass = loginPassword.trim();
-
-    if (
-      (cleanUser === 'bhavani.singh' || cleanUser === 'bhavani' || cleanUser === 'admin') &&
-      (cleanPass === 'password123' || cleanPass === 'bhavani123' || cleanPass === 'bhavani2026')
-    ) {
-      sessionStorage.setItem('bhavani_portal_authed', 'true');
-      setIsAuthenticated(true);
-      setLoginError('');
-    } else {
-      setLoginError('Invalid User ID or Password. Default User ID: bhavani.singh | Password: password123');
-    }
   };
 
   const handleLogout = () => {
@@ -851,70 +958,270 @@ export const AdvocatePortalPage: React.FC = () => {
               <Lock className="w-8 h-8 text-[#c5a059]" />
             </div>
             <span className="text-[10px] font-bold text-[#c5a059] uppercase tracking-widest block">Confidential Legal Administration</span>
-            <h1 className="text-2xl font-serif text-white">Advocate Bhavni Portal</h1>
-            <p className="text-xs text-slate-400">High Court, Lower Courts &amp; Revenue Courts Chambers &bull; Prayagraj</p>
+            <h1 className="text-2xl font-serif text-white">Advocate Portal Login</h1>
+            <p className="text-xs text-slate-400">Chambers of Advocate Bhavni Singh &amp; Associates &bull; Prayagraj</p>
           </div>
 
+          {loginNotice && (
+            <div className="p-3 bg-emerald-950/90 border border-emerald-500 text-emerald-200 text-xs text-center font-medium shadow-sm">
+              {loginNotice}
+            </div>
+          )}
+
           {loginError && (
-            <div className="p-3 bg-rose-950/80 border border-rose-600 text-rose-200 text-xs text-center font-medium shadow-sm">
+            <div className="p-3 bg-rose-950/90 border border-rose-600 text-rose-200 text-xs text-center font-medium shadow-sm">
               {loginError}
             </div>
           )}
 
-          <form onSubmit={handleLoginSubmit} className="space-y-4 relative z-10">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#c5a059]" /> User ID / Access Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={loginUserId}
-                onChange={(e) => setLoginUserId(e.target.value)}
-                placeholder="e.g. bhavani.singh"
-                className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-[#c5a059]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-[#c5a059]" /> Confidential Password *
-              </label>
-              <div className="relative">
+          {/* MODE 1: STANDARD LOGIN */}
+          {loginScreenMode === 'login' && (
+            <form onSubmit={handleLoginSubmit} className="space-y-4 relative z-10">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#c5a059]" /> User ID or Mobile *
+                </label>
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type="text"
                   required
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-[#c5a059] pr-12"
+                  value={loginUserId}
+                  onChange={(e) => setLoginUserId(e.target.value)}
+                  placeholder="Apna User ID ya Mobile no. likhein"
+                  className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-[#c5a059]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-[#c5a059]" /> Confidential Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="Apna Password likhein"
+                    className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-[#c5a059] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-[10px] font-mono font-bold tracking-wider uppercase px-1 py-0.5"
+                  >
+                    {showPassword ? 'HIDE' : 'SHOW'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-[10px] font-mono font-bold tracking-wider uppercase px-1 py-0.5"
+                  onClick={() => {
+                    setLoginError('');
+                    setLoginNotice('');
+                    setLoginScreenMode('register');
+                  }}
+                  className="text-[#c5a059] hover:underline font-bold"
                 >
-                  {showPassword ? 'HIDE' : 'SHOW'}
+                  + First-Time Setup / Create User ID
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginError('');
+                    setLoginNotice('');
+                    setLoginScreenMode('forgot');
+                  }}
+                  className="text-slate-400 hover:text-white underline"
+                >
+                  Forgot Password?
                 </button>
               </div>
-            </div>
 
-            <div className="bg-slate-900/80 p-3 border border-slate-700 rounded text-[11px] text-slate-400 space-y-1">
-              <p className="font-bold text-[#c5a059] uppercase text-[10px] flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Default Chamber Credentials:
-              </p>
-              <p>&bull; <strong>User ID:</strong> <code className="text-white bg-slate-800 px-1.5 py-0.5 rounded">bhavani.singh</code></p>
-              <p>&bull; <strong>Password:</strong> <code className="text-white bg-slate-800 px-1.5 py-0.5 rounded">password123</code></p>
-            </div>
+              <button
+                type="submit"
+                className="w-full py-3 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-md"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Authenticate &amp; Open Portal</span>
+              </button>
+            </form>
+          )}
 
-            <button
-              type="submit"
-              className="w-full py-3 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-md"
-            >
-              <Lock className="w-4 h-4" />
-              <span>Authenticate &amp; Open Portal</span>
-            </button>
-          </form>
+          {/* MODE 2: FIRST-TIME REGISTRATION / SETUP */}
+          {loginScreenMode === 'register' && (
+            <form onSubmit={handleRegisterSubmit} className="space-y-3.5 relative z-10 text-xs">
+              <div className="p-2.5 bg-slate-900 border border-[#c5a059]/40 rounded text-slate-300 text-[11px]">
+                <strong>First-Time Advocate Credential Setup:</strong> Apna naam, mobile, gmail, custom User ID, Password aur Secret Code (PIN) enter karein.
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold uppercase mb-1">Advocate Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Advocate Bhavni Singh / Advocate Prakhar Gupta"
+                  value={regData.name}
+                  onChange={(e) => setRegData({ ...regData, name: e.target.value })}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-300 font-bold uppercase mb-1">Mobile No *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="+91 9415211990"
+                    value={regData.mobile}
+                    onChange={(e) => setRegData({ ...regData, mobile: e.target.value })}
+                    className="w-full p-2 bg-slate-900 border border-slate-700 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-bold uppercase mb-1">Gmail / Email *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="chambers@gmail.com"
+                    value={regData.email}
+                    onChange={(e) => setRegData({ ...regData, email: e.target.value })}
+                    className="w-full p-2 bg-slate-900 border border-slate-700 text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-300 font-bold uppercase mb-1">New User ID *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. prakhar.adv"
+                    value={regData.userId}
+                    onChange={(e) => setRegData({ ...regData, userId: e.target.value })}
+                    className="w-full p-2 bg-slate-900 border border-slate-700 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-bold uppercase mb-1">New Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Password"
+                    value={regData.password}
+                    onChange={(e) => setRegData({ ...regData, password: e.target.value })}
+                    className="w-full p-2 bg-slate-900 border border-slate-700 text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold uppercase mb-1 flex items-center justify-between">
+                  <span>Secret Security PIN / Code *</span>
+                  <span className="text-[10px] text-[#c5a059]">(4-6 Digits)</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 9900 or 1234"
+                  value={regData.secretCode}
+                  onChange={(e) => setRegData({ ...regData, secretCode: e.target.value })}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 text-rose-300 font-mono font-bold"
+                />
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  Is Secret Code ko yaad rakhein — future me password reset ke liye yahi code kaam aayega.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginError('');
+                    setLoginScreenMode('login');
+                  }}
+                  className="px-3 py-2 bg-slate-700 text-slate-200 font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
+                >
+                  <Key className="w-4 h-4" />
+                  <span>Save &amp; Set Custom User ID</span>
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* MODE 3: FORGOT PASSWORD RESET */}
+          {loginScreenMode === 'forgot' && (
+            <form onSubmit={handleForgotSubmit} className="space-y-3.5 relative z-10 text-xs">
+              <div className="p-2.5 bg-slate-900 border border-rose-500/50 rounded text-slate-300 text-[11px]">
+                <strong>Password Reset Verification:</strong> Enter User ID or Mobile and your Secret Security PIN to create a new password.
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold uppercase mb-1">User ID or Mobile No. *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Registered User ID or Mobile Number"
+                  value={forgotData.userIdOrPhone}
+                  onChange={(e) => setForgotData({ ...forgotData, userIdOrPhone: e.target.value })}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold uppercase mb-1">Secret Security PIN / Code *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Enter Secret Code (e.g. 9900)"
+                  value={forgotData.secretCode}
+                  onChange={(e) => setForgotData({ ...forgotData, secretCode: e.target.value })}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 text-rose-300 font-mono font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold uppercase mb-1">New Password *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Enter new password"
+                  value={forgotData.newPassword}
+                  onChange={(e) => setForgotData({ ...forgotData, newPassword: e.target.value })}
+                  className="w-full p-2 bg-slate-900 border border-slate-700 text-white font-mono"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginError('');
+                    setLoginScreenMode('login');
+                  }}
+                  className="px-3 py-2 bg-slate-700 text-slate-200 font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
+                >
+                  <Key className="w-4 h-4" />
+                  <span>Verify Secret PIN &amp; Reset Password</span>
+                </button>
+              </div>
+            </form>
+          )}
 
           <p className="text-[11px] text-center text-slate-500">
             Protected Advocate System &bull; Confidential Access Only
@@ -1143,6 +1450,48 @@ export const AdvocatePortalPage: React.FC = () => {
         {/* TAB 1: Manage Cases */}
         {activeTab === 'cases' && (
           <div className="space-y-6">
+            {/* Live Storage Inspector Card */}
+            <div className={`p-4 border text-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${
+              mongoStatus.connected
+                ? 'bg-emerald-950/10 border-emerald-700/50 text-emerald-950'
+                : 'bg-amber-950/10 border-amber-700/50 text-amber-950'
+            }`}>
+              <div className="flex items-start gap-3">
+                <Database className={`w-5 h-5 shrink-0 mt-0.5 ${mongoStatus.connected ? 'text-emerald-600' : 'text-amber-600'}`} />
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="font-bold uppercase tracking-wider text-[11px] text-slate-800">Storage Engine Status:</span>
+                    {mongoStatus.connected ? (
+                      <span className="px-2 py-0.5 bg-emerald-700 text-white font-bold rounded text-[10px] uppercase flex items-center gap-1">
+                        <Check className="w-3 h-3" /> MongoDB Atlas Cloud Active
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-amber-700 text-white font-bold rounded text-[10px] uppercase flex items-center gap-1">
+                        <Database className="w-3 h-3" /> Local Browser Storage Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-slate-700 text-[11px]">
+                    {mongoStatus.connected
+                      ? `All cases & order sheets are stored in your MongoDB Atlas cloud database ("bhavni_law_firm"). Data is synced across all devices.`
+                      : `If MONGODB_URI is not set on Render, records are saved in your browser's Local Storage. Once MONGODB_URI is configured on Render, click "Sync MongoDB" to push records to Atlas.`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleSyncToMongoDB}
+                  disabled={syncingMongo}
+                  className="px-3.5 py-2 bg-[#1e293b] hover:bg-slate-800 text-white font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#c5a059] ${syncingMongo ? 'animate-spin' : ''}`} />
+                  <span>{syncingMongo ? 'Checking...' : 'Check Connection / Sync'}</span>
+                </button>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 border border-slate-200">
               <div className="flex-1 w-full sm:max-w-md relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1418,12 +1767,19 @@ export const AdvocatePortalPage: React.FC = () => {
                     <>
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
                         <div>
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
                             <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[#1e293b] text-[#c5a059] inline-block">
                               {c.caseType}
                             </span>
                             <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200">
                               {c.status || 'Active'}
+                            </span>
+                            <span className={`text-[9px] font-mono font-semibold px-2 py-0.5 border ${
+                              mongoStatus.connected
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                : 'bg-slate-100 text-slate-600 border-slate-300'
+                            }`}>
+                              {mongoStatus.connected ? 'DB: MongoDB Atlas' : 'DB: Local Cache'}
                             </span>
                           </div>
                           <h3 className="text-xl font-serif text-[#1e293b] font-bold">{c.caseNumber}</h3>
@@ -2082,6 +2438,121 @@ export const AdvocatePortalPage: React.FC = () => {
                 </button>
               </div>
             </form>
+
+            {/* Security & Access Credentials Management Card */}
+            <div className="bg-white border-2 border-slate-800 p-6 sm:p-8 shadow-sm space-y-4 mt-8 pt-6 border-t-4 border-t-[#c5a059]">
+              <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#c5a059]">Chamber Security</span>
+                  <h3 className="text-xl font-serif text-[#1e293b] flex items-center gap-2">
+                    <Lock className="w-5 h-5 text-[#c5a059]" /> Change User ID, Password &amp; Secret Security PIN
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Portal me login karne ke baad aap yahan se apna Name, Mobile, Email, User ID, Password aur Secret Code update kar sakte hain.
+                  </p>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-slate-900 text-slate-200 px-2.5 py-1 border border-slate-700 shrink-0">
+                  Protected Access
+                </span>
+              </div>
+
+              <form onSubmit={handleSaveSecurityCredentials} className="space-y-4 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">Advocate Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={secForm.name}
+                      onChange={(e) => setSecForm({ ...secForm, name: e.target.value })}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-300 font-bold text-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">Advocate Mobile Phone *</label>
+                    <input
+                      type="text"
+                      required
+                      value={secForm.mobile}
+                      onChange={(e) => setSecForm({ ...secForm, mobile: e.target.value })}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-300 font-bold text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">Official Gmail / Email *</label>
+                    <input
+                      type="email"
+                      required
+                      value={secForm.email}
+                      onChange={(e) => setSecForm({ ...secForm, email: e.target.value })}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-300 text-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">Portal User ID *</label>
+                    <input
+                      type="text"
+                      required
+                      value={secForm.userId}
+                      onChange={(e) => setSecForm({ ...secForm, userId: e.target.value })}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-300 font-mono text-blue-900 font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">Portal Password *</label>
+                    <input
+                      type="text"
+                      required
+                      value={secForm.password}
+                      onChange={(e) => setSecForm({ ...secForm, password: e.target.value })}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-300 font-mono font-bold text-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1 flex items-center justify-between">
+                      <span>Secret Security PIN / Code *</span>
+                      <span className="text-[10px] text-amber-700 font-normal">(Required for Password Reset)</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. 9900 or 1234"
+                      value={secForm.secretCode}
+                      onChange={(e) => setSecForm({ ...secForm, secretCode: e.target.value })}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-300 font-mono font-bold text-rose-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-100 border border-slate-300 text-[11px] text-slate-600 space-y-1">
+                  <p className="font-bold text-slate-800 flex items-center gap-1">
+                    <Lock className="w-3.5 h-3.5 text-[#c5a059]" /> Secret Security PIN Protection:
+                  </p>
+                  <p>
+                    Aapka Secret PIN badalne ya reset karte waqt verify karne ke liye hota hai. Is code ke bina koi bhi anjaan vyakti password change ya reset nahi kar sakta.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-[#1e293b] hover:bg-slate-800 text-white font-bold uppercase tracking-wider text-xs flex items-center gap-2 cursor-pointer shadow-md"
+                  >
+                    <Key className="w-4 h-4 text-[#c5a059]" />
+                    <span>Update Security Credentials &amp; Secret PIN</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 

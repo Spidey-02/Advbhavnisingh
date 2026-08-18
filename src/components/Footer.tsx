@@ -152,6 +152,33 @@ export const Footer: React.FC<FooterProps> = ({
 
         </div>
 
+        {/* SEO Keywords Index Section for Google Rank #1 Search Indexing */}
+        <div className="py-6 border-b border-slate-800/80 text-[11px] text-slate-400 space-y-2">
+          <div className="flex items-center gap-2 text-[#c5a059] font-bold uppercase text-[10px] tracking-wider">
+            <span>Google Search Index Keywords &amp; Quick Practice Areas:</span>
+          </div>
+          <div className="flex flex-wrap gap-x-2 gap-y-1 font-mono text-[10px] text-slate-400">
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>bhavni singh</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>advocate high court</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>allahabad high court</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('client-portal')}>high court order</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>allahabad</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>high court</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('about')}>advocate bhavni singh</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('about')}>advocate prakhar gupta</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('client-portal')}>allahabad high court order sheet</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('client-portal')}>allahabad high court case status</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>prayagraj high court advocate</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>high court order copy prayagraj</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>best advocate in allahabad high court</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>top lawyer allahabad high court</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>writ petition advocate allahabad</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>bail lawyer high court allahabad</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('expertise')}>revenue court prayagraj lawyer</span> &bull;
+            <span className="hover:text-white cursor-pointer" onClick={() => onNavigate('about')}>bhavni singh and associates</span>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>&copy; {new Date().getFullYear()} {firmDetails.name}. All Rights Reserved.</p>
