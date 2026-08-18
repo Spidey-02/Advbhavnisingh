@@ -2899,14 +2899,26 @@ export const AdvocatePortalPage: React.FC = () => {
                           </button>
                         </div>
 
-                        <div>
-                          <label className="font-bold text-slate-700 block mb-0.5">Chamber Name:</label>
-                          <input
-                            type="text"
-                            value={editLocData.name || ''}
-                            onChange={(e) => setEditLocData({ ...editLocData, name: e.target.value })}
-                            className="w-full p-2 bg-white border"
-                          />
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="font-bold text-slate-700 block mb-0.5">Chamber Name:</label>
+                            <input
+                              type="text"
+                              value={editLocData.name || ''}
+                              onChange={(e) => setEditLocData({ ...editLocData, name: e.target.value })}
+                              className="w-full p-2 bg-white border"
+                            />
+                          </div>
+                          <div>
+                            <label className="font-bold text-slate-700 block mb-0.5">Location Type:</label>
+                            <input
+                              type="text"
+                              value={editLocData.type || ''}
+                              onChange={(e) => setEditLocData({ ...editLocData, type: e.target.value })}
+                              placeholder="e.g. High Court Chamber"
+                              className="w-full p-2 bg-white border"
+                            />
+                          </div>
                         </div>
 
                         <div>
@@ -2935,6 +2947,29 @@ export const AdvocatePortalPage: React.FC = () => {
                               type="text"
                               value={editLocData.phone || ''}
                               onChange={(e) => setEditLocData({ ...editLocData, phone: e.target.value })}
+                              className="w-full p-2 bg-white border"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="font-bold text-slate-700 block mb-0.5">Chamber Email ID:</label>
+                            <input
+                              type="email"
+                              value={editLocData.email || ''}
+                              onChange={(e) => setEditLocData({ ...editLocData, email: e.target.value })}
+                              placeholder="office@lawfirm.com"
+                              className="w-full p-2 bg-white border"
+                            />
+                          </div>
+                          <div>
+                            <label className="font-bold text-slate-700 block mb-0.5">Office Hours:</label>
+                            <input
+                              type="text"
+                              value={editLocData.hours || ''}
+                              onChange={(e) => setEditLocData({ ...editLocData, hours: e.target.value })}
+                              placeholder="Mon - Sat: 10:00 AM - 7:00 PM"
                               className="w-full p-2 bg-white border"
                             />
                           </div>
