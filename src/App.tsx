@@ -126,7 +126,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans antialiased flex flex-col selection:bg-[#c5a059] selection:text-white">
+    <div className="min-h-screen max-w-full overflow-x-hidden bg-[#f8fafc] text-slate-900 font-sans antialiased flex flex-col selection:bg-[#c5a059] selection:text-white">
       {/* Dynamic SEO Meta & Title Manager */}
       <SEOHead currentPath={currentPath} />
       

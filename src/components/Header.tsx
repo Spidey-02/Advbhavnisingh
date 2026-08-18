@@ -87,28 +87,49 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Main Brand & Action Header Row */}
-      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-3.5 flex items-center justify-between gap-6 border-b border-slate-100">
+      <div className="max-w-[1600px] w-full mx-auto px-3 sm:px-8 md:px-12 lg:px-16 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4 border-b border-slate-100 overflow-hidden">
         
         {/* Brand Logo & Name */}
         <div 
           onClick={() => handleNavClick('/home')}
-          className="flex items-center gap-3.5 cursor-pointer group shrink-0"
+          className="flex items-center gap-2 sm:gap-3.5 cursor-pointer group min-w-0 flex-1 overflow-hidden"
         >
-          <div className="w-11 h-11 bg-[#1e293b] flex items-center justify-center shrink-0 group-hover:bg-[#c5a059] transition-colors shadow-md">
-            <Scale className="w-6 h-6 text-[#c5a059] group-hover:text-white transition-colors" />
+          <div className="w-9 h-9 sm:w-11 sm:h-11 bg-[#1e293b] flex items-center justify-center shrink-0 group-hover:bg-[#c5a059] transition-colors shadow-md">
+            <Scale className="w-5 h-5 sm:w-6 sm:h-6 text-[#c5a059] group-hover:text-white transition-colors" />
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold font-serif-heading tracking-tight text-[#1e293b] group-hover:text-[#c5a059] transition-colors uppercase leading-tight">
+          <div className="min-w-0 overflow-hidden pr-1">
+            <h1 className="text-sm sm:text-xl md:text-2xl font-bold font-serif-heading tracking-tight text-[#1e293b] group-hover:text-[#c5a059] transition-colors uppercase leading-tight truncate">
               {firmDetails.name}
             </h1>
-            <p className="text-[11px] sm:text-xs font-bold tracking-wider text-[#c5a059] uppercase leading-snug">
+            <p className="text-[9.5px] sm:text-xs font-bold tracking-tight sm:tracking-wider text-[#c5a059] uppercase leading-tight line-clamp-2 sm:line-clamp-none break-words">
               {firmDetails.tagline}
             </p>
           </div>
         </div>
 
-        {/* Action Button & Mobile Toggle */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Action Buttons & Mobile Toggle (Guaranteed visible inside screen!) */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Quick Mobile Call Button */}
+          <a
+            href={`tel:${firmDetails.phone}`}
+            className="flex sm:hidden items-center justify-center p-2 bg-[#1e293b] hover:bg-[#2d3d54] text-[#c5a059] border border-[#c5a059]/40 rounded shadow-sm cursor-pointer"
+            title={`Call Chambers: ${firmDetails.phone}`}
+          >
+            <Phone className="w-3.5 h-3.5" />
+          </a>
+
+          {/* Quick Mobile WhatsApp Button */}
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex sm:hidden items-center justify-center p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded shadow-sm cursor-pointer"
+            title="WhatsApp Chat"
+          >
+            <MessageSquare className="w-3.5 h-3.5 fill-white" />
+          </a>
+
+          {/* Desktop Book Consultation */}
           <button
             onClick={onOpenAppointment}
             className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md cursor-pointer border border-[#c5a059]/50"
@@ -116,9 +137,18 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Book Consultation</span>
           </button>
 
+          {/* Compact Mobile Book Button */}
+          <button
+            onClick={onOpenAppointment}
+            className="flex sm:hidden items-center gap-1 px-2 py-1.5 bg-[#c5a059] hover:bg-[#a88442] text-white font-bold text-[10px] uppercase rounded shadow-sm cursor-pointer border border-[#c5a059]/50 whitespace-nowrap"
+          >
+            <span>Book</span>
+          </button>
+
+          {/* Mobile Hamburger Sidebar Menu Icon */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-700 hover:text-[#c5a059] focus:outline-none"
+            className="lg:hidden p-1.5 sm:p-2 text-slate-800 hover:text-[#c5a059] focus:outline-none shrink-0"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

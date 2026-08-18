@@ -16,40 +16,76 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
   const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal guidance.')}`;
 
   return (
-    <div className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-40 flex flex-col items-end gap-2 sm:gap-3 max-w-[calc(100vw-1.5rem)] pointer-events-none">
-      
-      {/* WhatsApp Chat Floating Button */}
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="pointer-events-auto px-3.5 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider cursor-pointer border border-emerald-500/30 rounded-none shrink-0"
-        aria-label="Chat on WhatsApp"
-      >
-        <MessageSquare className="w-4 h-4 fill-white shrink-0" />
-        <span>WhatsApp Advocate</span>
-      </a>
+    <>
+      {/* Mobile Fixed Bottom Action Bar (100% Fitted inside Mobile Screen) */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1e293b] border-t-2 border-[#c5a059] shadow-2xl flex items-center justify-around py-2 px-2 text-white">
+        {/* Call Now */}
+        <a
+          href={`tel:${firmDetails.phone}`}
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-1 text-slate-200 hover:text-[#c5a059] transition-colors border-r border-slate-700 cursor-pointer"
+          aria-label={`Call Chambers at ${firmDetails.phone}`}
+        >
+          <Phone className="w-4 h-4 text-[#c5a059]" />
+          <span className="text-[10px] font-bold uppercase tracking-tight">Call Now</span>
+        </a>
 
-      {/* Book Appointment Floating Button */}
-      <button
-        onClick={onOpenAppointment}
-        className="pointer-events-auto px-4 py-2.5 sm:px-5 sm:py-3 bg-[#c5a059] hover:bg-[#a88442] text-white shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider cursor-pointer border border-[#c5a059]/40 rounded-none shrink-0"
-        aria-label="Book Appointment"
-      >
-        <Calendar className="w-4 h-4 shrink-0" />
-        <span>Book Consultation</span>
-      </button>
+        {/* WhatsApp Chat */}
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-1 text-emerald-400 hover:text-emerald-300 transition-colors border-r border-slate-700 cursor-pointer"
+          aria-label="Chat on WhatsApp"
+        >
+          <MessageSquare className="w-4 h-4 fill-emerald-400 text-emerald-400" />
+          <span className="text-[10px] font-bold uppercase tracking-tight">WhatsApp</span>
+        </a>
 
-      {/* Direct Call Floating Button */}
-      <a
-        href={`tel:${firmDetails.phone}`}
-        className="pointer-events-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1e293b] hover:bg-[#c5a059] text-white border-2 border-[#c5a059] flex items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer shrink-0"
-        aria-label={`Call Advocate Bhavni Singh at ${firmDetails.phone}`}
-        title={`Call Advocate Bhavni Singh at ${firmDetails.phone}`}
-      >
-        <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-[#c5a059] hover:text-white" />
-      </a>
+        {/* Book Consultation */}
+        <button
+          onClick={onOpenAppointment}
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[#c5a059] hover:text-white transition-colors cursor-pointer"
+          aria-label="Book Consultation"
+        >
+          <Calendar className="w-4 h-4 text-[#c5a059]" />
+          <span className="text-[10px] font-bold uppercase tracking-tight">Book</span>
+        </button>
+      </div>
 
-    </div>
+      {/* Desktop Floating Actions Stack */}
+      <div className="hidden sm:flex fixed bottom-6 right-6 z-40 flex-col items-end gap-3 pointer-events-none">
+        {/* WhatsApp Chat Floating Button */}
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2 text-xs font-bold uppercase tracking-wider cursor-pointer border border-emerald-500/30 shrink-0"
+          aria-label="Chat on WhatsApp"
+        >
+          <MessageSquare className="w-4 h-4 fill-white shrink-0" />
+          <span>WhatsApp Advocate</span>
+        </a>
+
+        {/* Book Appointment Floating Button */}
+        <button
+          onClick={onOpenAppointment}
+          className="pointer-events-auto px-5 py-3 bg-[#c5a059] hover:bg-[#a88442] text-white shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2 text-xs font-bold uppercase tracking-wider cursor-pointer border border-[#c5a059]/40 shrink-0"
+          aria-label="Book Appointment"
+        >
+          <Calendar className="w-4 h-4 shrink-0" />
+          <span>Book Consultation</span>
+        </button>
+
+        {/* Direct Call Floating Button */}
+        <a
+          href={`tel:${firmDetails.phone}`}
+          className="pointer-events-auto w-12 h-12 rounded-full bg-[#1e293b] hover:bg-[#c5a059] text-white border-2 border-[#c5a059] flex items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer shrink-0"
+          aria-label={`Call Advocate Bhavni Singh at ${firmDetails.phone}`}
+          title={`Call Advocate Bhavni Singh at ${firmDetails.phone}`}
+        >
+          <Phone className="w-5 h-5 text-[#c5a059] hover:text-white" />
+        </a>
+      </div>
+    </>
   );
 };
