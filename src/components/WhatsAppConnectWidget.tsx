@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MessageSquare, Phone, Mail, MapPin, QrCode, ExternalLink, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useFirmData } from '../hooks/useFirmData';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 interface WhatsAppConnectWidgetProps {
   compact?: boolean;
@@ -10,15 +11,10 @@ export const WhatsAppConnectWidget: React.FC<WhatsAppConnectWidgetProps> = ({ co
   const { firmDetails, officeLocations } = useFirmData();
   const [copied, setCopied] = useState(false);
 
-  // Strip spaces, dashes, + from phone for wa.me link
-  const rawPhone = firmDetails.whatsapp || firmDetails.phone;
-  const cleanPhone = rawPhone.replace(/[^0-9]/g, '');
-  // Default to India country code 91 if length is 10
-  const formattedWaNumber = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-
-  const whatsappUrl = `https://wa.me/${formattedWaNumber}?text=${encodeURIComponent(
-    `Hello Advocate Bhavni Singh, I need legal consultation regarding an Allahabad High Court matter.`
-  )}`;
+  const whatsappUrl = getWhatsAppUrl(
+    firmDetails.whatsapp || firmDetails.phone,
+    'Hello Advocate Bhavni Singh, I need legal consultation regarding an Allahabad High Court matter.'
+  );
 
   const qrCodeImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(whatsappUrl)}&color=1e293b&bgcolor=ffffff`;
 

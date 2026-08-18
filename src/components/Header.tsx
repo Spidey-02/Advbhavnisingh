@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Phone, Mail, Scale, Menu, X, Sparkles, ExternalLink, MessageSquare, QrCode } from 'lucide-react';
 import { useFirmData } from '../hooks/useFirmData';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 interface HeaderProps {
   currentPath: string;
@@ -35,8 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
     setMobileMenuOpen(false);
   };
 
-  const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
-  const waUrl = `https://wa.me/91${cleanWaNumber.length === 10 ? cleanWaNumber : cleanWaNumber}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal consultation.')}`;
+  const waUrl = getWhatsAppUrl(firmDetails.whatsapp || firmDetails.phone, 'Hello Advocate Bhavni Singh, I need legal consultation.');
   const mailtoUrl = `mailto:${firmDetails.email}?subject=${encodeURIComponent('Legal Consultation Request')}&body=${encodeURIComponent('Respected Advocate Bhavni Singh,\n\nI need legal advice regarding...')}`;
 
   return (

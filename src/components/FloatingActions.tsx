@@ -1,6 +1,7 @@
 import React from 'react';
 import { Phone, Calendar, MessageSquare } from 'lucide-react';
 import { useFirmData } from '../hooks/useFirmData';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 interface FloatingActionsProps {
   onOpenAppointment: () => void;
@@ -10,10 +11,7 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({
   onOpenAppointment
 }) => {
   const { firmDetails } = useFirmData();
-
-  const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
-  const formattedWa = cleanWaNumber.length === 10 ? `91${cleanWaNumber}` : cleanWaNumber;
-  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal guidance.')}`;
+  const waUrl = getWhatsAppUrl(firmDetails.whatsapp || firmDetails.phone, 'Hello Advocate Bhavni Singh, I need legal guidance.');
 
   return (
     <>

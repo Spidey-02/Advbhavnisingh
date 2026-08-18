@@ -3,6 +3,7 @@ import { LocationsMapSection } from '../components/LocationsMapSection';
 import { WhatsAppConnectWidget } from '../components/WhatsAppConnectWidget';
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle2, ShieldCheck, Scale, ExternalLink, QrCode, MessageSquare } from 'lucide-react';
 import { useFirmData } from '../hooks/useFirmData';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 export const ContactPage: React.FC = () => {
   const { firmDetails, officeLocations } = useFirmData();
@@ -36,9 +37,7 @@ export const ContactPage: React.FC = () => {
     localStorage.setItem('bhavni_enquiries', JSON.stringify([newQuery, ...existingQueries]));
   };
 
-  const cleanWaNumber = (firmDetails.whatsapp || firmDetails.phone).replace(/[^0-9]/g, '');
-  const formattedWa = cleanWaNumber.length === 10 ? `91${cleanWaNumber}` : cleanWaNumber;
-  const waUrl = `https://wa.me/${formattedWa}?text=${encodeURIComponent('Hello Advocate Bhavni Singh, I need legal consultation.')}`;
+  const waUrl = getWhatsAppUrl(firmDetails.whatsapp || firmDetails.phone, 'Hello Advocate Bhavni Singh, I need legal consultation.');
 
   const emailSubject = encodeURIComponent("Legal Consultation Request — High Court Chambers");
   const emailBody = encodeURIComponent(

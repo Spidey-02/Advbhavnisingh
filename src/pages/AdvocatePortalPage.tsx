@@ -3,6 +3,7 @@ import { INITIAL_CLIENT_CASES, FIRM_DETAILS, OFFICE_LOCATIONS } from '../data/le
 import { ClientCase, EnquiryItem, OfficeLocation, BlogPost, CaseStudy, HeroSlide, ClientProfile } from '../types';
 import { getApiUrl } from '../config';
 import { formatDateToDDMMYYYY, getTodayDDMMYYYY } from '../utils/dateFormatter';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 import {
   getStoredFirmDetails,
   saveFirmDetails,
@@ -68,36 +69,78 @@ export const AdvocatePortalPage: React.FC = () => {
   // In-Portal Security Credentials Form State
   const [secForm, setSecForm] = useState<AdvocateCreds>(getStoredAdvocateCreds());
 
-  // Handle Login
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  // Handle Login (Cross-Device MongoDB Verified)
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanUser = loginUserId.trim().toLowerCase();
     const cleanPass = loginPassword.trim();
-    const currentCreds = getStoredAdvocateCreds();
 
     if (!cleanUser || !cleanPass) {
       setLoginError('Kripya User ID aur Password dono fill karein.');
       return;
     }
 
-    if (
-      (cleanUser === currentCreds.userId.toLowerCase() && cleanPass === currentCreds.password) ||
-      (cleanUser === currentCreds.mobile.replace(/\D/g, '') && cleanPass === currentCreds.password) ||
-      (cleanUser === 'admin' && cleanPass === 'password123') ||
-      (cleanUser === 'bhavani.singh' && cleanPass === 'password123')
-    ) {
+    const checkMatch = (creds: AdvocateCreds) => {
+      const dbUser = (creds.userId || '').toLowerCase().trim();
+      const dbMobile = (creds.mobile || '').replace(/\D/g, '');
+      const dbPass = (creds.password || '').trim();
+      return (
+        (cleanUser === dbUser && cleanPass === dbPass) ||
+        (cleanUser === dbMobile && cleanPass === dbPass) ||
+        (cleanUser === 'admin' && cleanPass === 'password123') ||
+        (cleanUser === 'bhavani.singh' && cleanPass === 'password123')
+      );
+    };
+
+    let currentCreds = getStoredAdvocateCreds();
+
+    // 1. First check local storage credentials
+    if (checkMatch(currentCreds)) {
       sessionStorage.setItem('bhavani_portal_authed', 'true');
       setIsAuthenticated(true);
       setLoginError('');
       setLoginNotice('');
-    } else {
-      setLoginError('Sahi User ID aur Password dalein. (Agar aap password bhool gaye hain toh "Forgot Password" se Secret PIN ke dwara reset karein).');
+      return;
     }
+
+    // 2. If local check failed, fetch fresh credentials directly from MongoDB Atlas! (Fixes Mobile Cross-Device Login)
+    try {
+      setLoginNotice('MongoDB Atlas se credentials verify ho rahe hain...');
+      const synced = await fetchAllFromMongoDBAndSyncLocal();
+      if (synced) {
+        currentCreds = getStoredAdvocateCreds();
+        setAdvocateCreds(currentCreds);
+        setSecForm(currentCreds);
+        if (checkMatch(currentCreds)) {
+          sessionStorage.setItem('bhavani_portal_authed', 'true');
+          setIsAuthenticated(true);
+          setLoginError('');
+          setLoginNotice('');
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('Cross-device Mongo verification error:', err);
+    }
+
+    setLoginError('Sahi User ID aur Password dalein. (Agar aap password bhool gaye hain toh "Forgot Password" se Secret PIN ke dwara reset karein).');
+    setLoginNotice('');
   };
 
-  // Handle First-Time Registration
+  // Handle First-Time Registration (Enforces ONLY ONE Admin Account)
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if an ID/Password is already registered
+    const existingCreds = getStoredAdvocateCreds();
+    const hasCustomCreds = Boolean(existingCreds.userId && existingCreds.userId !== 'bhavani.singh' && existingCreds.password !== 'password123');
+
+    if (hasCustomCreds) {
+      setLoginError('Ek Admin ID & Password pehle se bana hua hai! Ek se zyada ID banane ki anumati nahi hai. Aap apni bani ID & Password se Login karein ya Secret PIN se Reset karein.');
+      setLoginScreenMode('login');
+      return;
+    }
+
     if (!regData.userId.trim() || !regData.password.trim() || !regData.secretCode.trim()) {
       setLoginError('User ID, Password aur Secret Code (PIN) compulsory hain!');
       return;
@@ -1059,17 +1102,23 @@ export const AdvocatePortalPage: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between text-xs pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginError('');
-                    setLoginNotice('');
-                    setLoginScreenMode('register');
-                  }}
-                  className="text-[#c5a059] hover:underline font-bold"
-                >
-                  + First-Time Setup / Create User ID
-                </button>
+                {advocateCreds.userId && advocateCreds.userId !== 'bhavani.singh' ? (
+                  <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-[#c5a059]" /> Primary Admin ID Active
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginError('');
+                      setLoginNotice('');
+                      setLoginScreenMode('register');
+                    }}
+                    className="text-[#c5a059] hover:underline font-bold"
+                  >
+                    + First-Time Setup / Create User ID
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -1316,7 +1365,7 @@ export const AdvocatePortalPage: React.FC = () => {
               <div className="flex flex-wrap items-center gap-3 mt-1.5 text-[11px] text-slate-400">
                 <span>Phone: <a href={`tel:${firmProfile.phone}`} className="text-[#c5a059] hover:underline font-bold">{firmProfile.phone}</a></span>
                 <span>&bull;</span>
-                <span>WhatsApp: <a href={`https://wa.me/91${firmProfile.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-bold">{firmProfile.whatsapp}</a></span>
+                <span>WhatsApp: <a href={getWhatsAppUrl(firmProfile.whatsapp)} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-bold">{firmProfile.whatsapp}</a></span>
               </div>
             </div>
           </div>
@@ -2329,7 +2378,7 @@ export const AdvocatePortalPage: React.FC = () => {
                               <span>{cl.phone}</span>
                             </a>
                             <a
-                              href={`https://wa.me/91${cl.phone.replace(/[^0-9]/g, '')}`}
+                              href={getWhatsAppUrl(cl.phone)}
                               target="_blank"
                               rel="noreferrer"
                               className="px-2 py-0.5 bg-emerald-700 text-white rounded text-[10px] font-bold flex items-center gap-1"
