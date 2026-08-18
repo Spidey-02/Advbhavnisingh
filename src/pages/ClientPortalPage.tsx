@@ -166,26 +166,14 @@ export const ClientPortalPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Active Cases Pills */}
-          {allCases.length > 0 && (
-            <div className="pt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-              <span className="font-semibold text-slate-700">Active Registered Cases:</span>
-              {allCases.slice(0, 4).map((c, idx) => (
-                <button
-                  key={`demo-case-${c.id || c.caseNumber || 'item'}-${idx}`}
-                  onClick={() => {
-                    setSearchQuery(c.caseNumber);
-                    setSearchResults([c]);
-                    setSelectedCase(c);
-                    setSearched(true);
-                  }}
-                  className="px-2.5 py-1 bg-slate-100 hover:bg-[#c5a059] hover:text-white border border-slate-300 text-[11px] transition-colors"
-                >
-                  {c.caseNumber} ({c.clientName})
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Search Hint & Privacy Notice */}
+          <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-500 border-t border-slate-100">
+            <p className="flex items-center gap-1.5 text-slate-600 text-[11px]">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+              <strong>Privacy Guaranteed:</strong> Enter your unique Case Number or Registered Mobile Number above to view your case status.
+            </p>
+            <span className="text-[10px] text-slate-400 font-medium">100% Confidential & Private Case Tracker</span>
+          </div>
         </div>
 
         {/* Search Results Display */}

@@ -5,6 +5,7 @@ import {
   getStoredBlogs,
   getStoredCaseStudies,
   getStoredHeroSlides,
+  fetchAllFromMongoDBAndSyncLocal,
   FirmDetailsType
 } from '../data/firmStore';
 import { OfficeLocation, BlogPost, CaseStudy, HeroSlide } from '../types';
@@ -26,6 +27,9 @@ export const useFirmData = () => {
 
   useEffect(() => {
     refreshData();
+    // Sync live from MongoDB Atlas on mount for cross-device updates
+    fetchAllFromMongoDBAndSyncLocal();
+
     const handleUpdate = () => refreshData();
     window.addEventListener('firmDataUpdated', handleUpdate);
     window.addEventListener('storage', handleUpdate);

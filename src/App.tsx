@@ -5,6 +5,7 @@ import { FloatingActions } from './components/FloatingActions';
 import { Footer } from './components/Footer';
 import { EnquiryModal } from './components/EnquiryModal';
 import { SEOHead } from './components/SEOHead';
+import { fetchAllFromMongoDBAndSyncLocal } from './data/firmStore';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -21,6 +22,11 @@ export function App() {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState<boolean>(() => {
     return localStorage.getItem('bhavni_disclaimer_accepted') === 'true';
   });
+
+  useEffect(() => {
+    // Automatically fetch full firm details, slides, and cases from MongoDB Atlas on initial load
+    fetchAllFromMongoDBAndSyncLocal();
+  }, []);
 
   // Current page path route (defaults to /home)
   const [currentPath, setCurrentPath] = useState<string>(() => {

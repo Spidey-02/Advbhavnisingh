@@ -8,19 +8,26 @@ import { MongoClient } from "mongodb";
 dotenv.config();
 
 let mongoClient: MongoClient | null = null;
+let lastMongoError: string | null = null;
 
 async function getMongoDB() {
   const uri = process.env.MONGODB_URI;
-  if (!uri) return null;
+  if (!uri) {
+    lastMongoError = "MONGODB_URI environment variable is empty or not set.";
+    return null;
+  }
   try {
     if (!mongoClient) {
       mongoClient = new MongoClient(uri);
       await mongoClient.connect();
       console.log("Connected successfully to MongoDB Atlas database");
+      lastMongoError = null;
     }
     return mongoClient.db(process.env.MONGODB_DB_NAME || "bhavni_law_firm");
-  } catch (err) {
+  } catch (err: any) {
     console.error("MongoDB Atlas connection error:", err);
+    lastMongoError = err.message || String(err);
+    mongoClient = null; // reset client on error to retry next time
     return null;
   }
 }
@@ -48,7 +55,8 @@ async function startServer() {
     res.json({
       status: "ok",
       firm: "Bhavni Singh & Associates",
-      mongodbConfigured: Boolean(process.env.MONGODB_URI)
+      mongodbConfigured: Boolean(process.env.MONGODB_URI),
+      error: lastMongoError
     });
   });
 
@@ -58,7 +66,8 @@ async function startServer() {
     return res.json({
       configured: Boolean(process.env.MONGODB_URI),
       connected: Boolean(db),
-      databaseName: process.env.MONGODB_DB_NAME || "bhavni_law_firm"
+      databaseName: process.env.MONGODB_DB_NAME || "bhavni_law_firm",
+      error: lastMongoError
     });
   });
 
@@ -85,7 +94,10 @@ async function startServer() {
         return res.status(400).json({ error: "Case ID is required." });
       }
       if (!db) {
-        return res.json({ success: false, message: "MongoDB URI not configured. Saved in local storage." });
+        const errorDetail = process.env.MONGODB_URI
+          ? `MongoDB Atlas connection error: ${lastMongoError || 'Check Password / Network Access Access List'}. Data saved safely in Local Storage.`
+          : 'MongoDB URI environment variable not set on server. Data saved safely in Local Storage.';
+        return res.json({ success: false, message: errorDetail, error: lastMongoError });
       }
       await db.collection("client_cases").updateOne(
         { id: caseData.id },
@@ -134,6 +146,95 @@ async function startServer() {
       }
       return res.json({ success: true, message: "Case deleted." });
     } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // GET Full Firm & Case Store from MongoDB Atlas for cross-device sync
+  app.get("/api/sync/all", async (_req, res) => {
+    try {
+      const db = await getMongoDB();
+      if (!db) {
+        return res.json({ success: false, connected: false, message: "MongoDB not connected" });
+      }
+
+      const storeCol = db.collection("firm_store");
+      const casesCol = db.collection("client_cases");
+
+      const [firmDetailsDoc, officeLocationsDoc, heroSlidesDoc, blogsDoc, caseStudiesDoc, clientsDoc, advocateCredsDoc, enquiriesDoc, casesList] = await Promise.all([
+        storeCol.findOne({ _id: "firmDetails" as any }),
+        storeCol.findOne({ _id: "officeLocations" as any }),
+        storeCol.findOne({ _id: "heroSlides" as any }),
+        storeCol.findOne({ _id: "blogs" as any }),
+        storeCol.findOne({ _id: "caseStudies" as any }),
+        storeCol.findOne({ _id: "clients" as any }),
+        storeCol.findOne({ _id: "advocateCreds" as any }),
+        storeCol.findOne({ _id: "enquiries" as any }),
+        casesCol.find({}).toArray()
+      ]);
+
+      return res.json({
+        success: true,
+        connected: true,
+        data: {
+          firmDetails: firmDetailsDoc ? firmDetailsDoc.data : null,
+          officeLocations: officeLocationsDoc ? officeLocationsDoc.data : null,
+          heroSlides: heroSlidesDoc ? heroSlidesDoc.data : null,
+          blogs: blogsDoc ? blogsDoc.data : null,
+          caseStudies: caseStudiesDoc ? caseStudiesDoc.data : null,
+          clients: clientsDoc ? clientsDoc.data : null,
+          advocateCreds: advocateCredsDoc ? advocateCredsDoc.data : null,
+          enquiries: enquiriesDoc ? enquiriesDoc.data : null,
+          cases: casesList && casesList.length > 0 ? casesList : null
+        }
+      });
+    } catch (err: any) {
+      console.error("Error in GET /api/sync/all:", err);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // POST Sync Item to MongoDB Atlas (Firm Details, Hero Slides, Cases, etc.)
+  app.post("/api/sync/item", async (req, res) => {
+    try {
+      const db = await getMongoDB();
+      const { type, data } = req.body;
+      if (!type || !data) {
+        return res.status(400).json({ error: "Type and Data are required." });
+      }
+      if (!db) {
+        return res.json({ success: false, message: "MongoDB not connected. Changes saved in Local Storage." });
+      }
+
+      if (type === "cases" && Array.isArray(data)) {
+        const casesCol = db.collection("client_cases");
+        const currentIds = data.map((c: any) => c.id).filter(Boolean);
+        if (currentIds.length > 0) {
+          await casesCol.deleteMany({ id: { $nin: currentIds } });
+        } else {
+          await casesCol.deleteMany({});
+        }
+        for (const c of data) {
+          if (c.id) {
+            await casesCol.updateOne(
+              { id: c.id },
+              { $set: { ...c, updatedAt: new Date() } },
+              { upsert: true }
+            );
+          }
+        }
+      } else {
+        const storeCol = db.collection("firm_store");
+        await storeCol.updateOne(
+          { _id: type as any },
+          { $set: { _id: type as any, data, updatedAt: new Date() } },
+          { upsert: true }
+        );
+      }
+
+      return res.json({ success: true, message: `Successfully synced ${type} to MongoDB Atlas cloud database!` });
+    } catch (err: any) {
+      console.error("Error in POST /api/sync/item:", err);
       return res.status(500).json({ success: false, error: err.message });
     }
   });

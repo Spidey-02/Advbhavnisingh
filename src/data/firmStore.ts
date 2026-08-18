@@ -1,6 +1,7 @@
 import { FIRM_DETAILS, OFFICE_LOCATIONS, BLOG_POSTS, CASE_STUDIES } from './legalData';
-import { OfficeLocation, BlogPost, CaseStudy, HeroSlide, ClientProfile } from '../types';
+import { OfficeLocation, BlogPost, CaseStudy, HeroSlide, ClientProfile, ClientCase } from '../types';
 import { formatDateToDDMMYYYY } from '../utils/dateFormatter';
+import { getApiUrl } from '../config';
 
 import imgAllahabadHC from '../assets/images/allahabad_high_court_1786991749564.jpg';
 import imgLowerCourt from '../assets/images/prayagraj_lower_court_1786991768842.jpg';
@@ -249,34 +250,86 @@ export const getStoredClients = (): ClientProfile[] => {
   return DEFAULT_CLIENTS.map(c => ({ ...c, createdAt: formatDateToDDMMYYYY(c.createdAt) }));
 };
 
-// Setter functions that dispatch custom broadcast events
+// Setter functions that dispatch custom broadcast events & sync to MongoDB Atlas
 export const notifyFirmDataChanged = () => {
   window.dispatchEvent(new Event('firmDataUpdated'));
+};
+
+// Helper to push items directly to MongoDB Atlas
+export const syncItemToMongoDB = async (type: string, data: any) => {
+  try {
+    const url = getApiUrl('/api/sync/item');
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, data })
+    });
+  } catch (e) {
+    console.error(`Failed to sync ${type} to MongoDB Atlas:`, e);
+  }
+};
+
+// Helper to fetch entire state from MongoDB Atlas on cross-device app load
+export const fetchAllFromMongoDBAndSyncLocal = async (): Promise<boolean> => {
+  try {
+    const url = getApiUrl('/api/sync/all');
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json && json.success && json.connected && json.data) {
+      const { firmDetails, officeLocations, heroSlides, blogs, caseStudies, clients, advocateCreds, enquiries, cases } = json.data;
+      if (firmDetails) localStorage.setItem(STORAGE_KEYS.DETAILS, JSON.stringify(firmDetails));
+      if (officeLocations) localStorage.setItem(STORAGE_KEYS.LOCATIONS, JSON.stringify(officeLocations));
+      if (heroSlides) localStorage.setItem(STORAGE_KEYS.HERO_SLIDES, JSON.stringify(heroSlides));
+      if (blogs) localStorage.setItem(STORAGE_KEYS.BLOGS, JSON.stringify(blogs));
+      if (caseStudies) localStorage.setItem(STORAGE_KEYS.CASE_STUDIES, JSON.stringify(caseStudies));
+      if (clients) localStorage.setItem(STORAGE_KEYS.CLIENTS, JSON.stringify(clients));
+      if (advocateCreds) localStorage.setItem('bhavani_advocate_creds', JSON.stringify(advocateCreds));
+      if (enquiries) localStorage.setItem('bhavani_enquiries', JSON.stringify(enquiries));
+      if (cases && Array.isArray(cases) && cases.length > 0) localStorage.setItem('bhavani_cases', JSON.stringify(cases));
+
+      notifyFirmDataChanged();
+      return true;
+    }
+  } catch (e) {
+    console.error('Error in fetchAllFromMongoDBAndSyncLocal:', e);
+  }
+  return false;
 };
 
 export const saveFirmDetails = (details: FirmDetailsType) => {
   localStorage.setItem(STORAGE_KEYS.DETAILS, JSON.stringify(details));
   notifyFirmDataChanged();
+  syncItemToMongoDB('firmDetails', details);
 };
 
 export const saveOfficeLocations = (locations: OfficeLocation[]) => {
   localStorage.setItem(STORAGE_KEYS.LOCATIONS, JSON.stringify(locations));
   notifyFirmDataChanged();
+  syncItemToMongoDB('officeLocations', locations);
 };
 
 export const saveBlogs = (blogs: BlogPost[]) => {
   localStorage.setItem(STORAGE_KEYS.BLOGS, JSON.stringify(blogs));
   notifyFirmDataChanged();
+  syncItemToMongoDB('blogs', blogs);
 };
 
 export const saveCaseStudies = (caseStudies: CaseStudy[]) => {
   localStorage.setItem(STORAGE_KEYS.CASE_STUDIES, JSON.stringify(caseStudies));
   notifyFirmDataChanged();
+  syncItemToMongoDB('caseStudies', caseStudies);
 };
 
 export const saveHeroSlides = (heroSlides: HeroSlide[]) => {
   localStorage.setItem(STORAGE_KEYS.HERO_SLIDES, JSON.stringify(heroSlides));
   notifyFirmDataChanged();
+  syncItemToMongoDB('heroSlides', heroSlides);
+};
+
+export const saveEnquiries = (enquiries: any[]) => {
+  localStorage.setItem('bhavani_enquiries', JSON.stringify(enquiries));
+  notifyFirmDataChanged();
+  syncItemToMongoDB('enquiries', enquiries);
 };
 
 export interface AdvocateCreds {
@@ -320,10 +373,18 @@ export const getStoredAdvocateCreds = (): AdvocateCreds => {
 export const saveAdvocateCreds = (creds: AdvocateCreds) => {
   localStorage.setItem('bhavani_advocate_creds', JSON.stringify(creds));
   notifyFirmDataChanged();
+  syncItemToMongoDB('advocateCreds', creds);
 };
 
 export const saveClients = (clients: ClientProfile[]) => {
   localStorage.setItem(STORAGE_KEYS.CLIENTS, JSON.stringify(clients));
   notifyFirmDataChanged();
+  syncItemToMongoDB('clients', clients);
+};
+
+export const saveCases = (cases: ClientCase[]) => {
+  localStorage.setItem('bhavani_cases', JSON.stringify(cases));
+  notifyFirmDataChanged();
+  syncItemToMongoDB('cases', cases);
 };
 

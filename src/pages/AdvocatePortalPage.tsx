@@ -18,6 +18,9 @@ import {
   saveClients,
   getStoredAdvocateCreds,
   saveAdvocateCreds,
+  fetchAllFromMongoDBAndSyncLocal,
+  saveCases,
+  saveEnquiries,
   AdvocateCreds,
   FirmDetailsType
 } from '../data/firmStore';
@@ -25,7 +28,7 @@ import {
   Scale, Users, Calendar, Plus, Edit2, CheckCircle2, MapPin, Search, Trash2,
   ExternalLink, Save, Phone, Mail, Clock, Eye, Upload, Download, FileText,
   MessageSquare, BookOpen, User, Settings, Navigation, X, Sparkles, QrCode,
-  Lock, LogOut, Key, HelpCircle, Database, RefreshCw, Camera, Check, MessageCircle, UserCheck
+  Lock, LogOut, Key, HelpCircle, Database, RefreshCw, Camera, Check, MessageCircle, UserCheck, Layers
 } from 'lucide-react';
 
 export const AdvocatePortalPage: React.FC = () => {
@@ -431,6 +434,33 @@ export const AdvocatePortalPage: React.FC = () => {
       })
       .catch(() => {});
 
+    // Sync all firm details, slides, cases, and credentials from MongoDB Atlas on cross-device load
+    fetchAllFromMongoDBAndSyncLocal().then((synced) => {
+      if (synced) {
+        setFirmProfile(getStoredFirmDetails());
+        setLocationsList(getStoredOfficeLocations());
+        setBlogsList(getStoredBlogs());
+        setCaseStudiesList(getStoredCaseStudies());
+        setHeroSlidesList(getStoredHeroSlides());
+        setClientsList(getStoredClients());
+        const creds = getStoredAdvocateCreds();
+        setAdvocateCreds(creds);
+        setSecForm(creds);
+
+        const savedC = localStorage.getItem('bhavani_cases');
+        if (savedC) {
+          try {
+            const parsed = JSON.parse(savedC);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setCases(sanitizeCases(parsed));
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+    });
+
     // Cases - Load local first, then attempt MongoDB API fetch
     const savedCases = localStorage.getItem('bhavani_cases');
     let localCases: ClientCase[] = INITIAL_CLIENT_CASES;
@@ -514,7 +544,7 @@ export const AdvocatePortalPage: React.FC = () => {
   const saveCasesToStorage = async (updated: ClientCase[]) => {
     const sanitized = sanitizeCases(updated);
     setCases(sanitized);
-    localStorage.setItem('bhavani_cases', JSON.stringify(sanitized));
+    saveCases(sanitized);
 
     // Auto-sync to MongoDB Atlas cloud database
     try {
@@ -590,6 +620,15 @@ export const AdvocatePortalPage: React.FC = () => {
       setClientsList(updated);
       saveClients(updated);
       triggerToast('Client record removed from directory.');
+    }
+  };
+
+  const handleDeleteEnquiry = (enqId: string) => {
+    if (window.confirm('Are you sure you want to permanently delete this client query/enquiry?')) {
+      const updated = enquiries.filter(e => e.id !== enqId && e.phone !== enqId);
+      setEnquiries(updated);
+      saveEnquiries(updated);
+      triggerToast('Client query deleted successfully!');
     }
   };
 
@@ -765,11 +804,16 @@ export const AdvocatePortalPage: React.FC = () => {
     }
   };
 
-  const handleDeleteCase = (id: string) => {
+  const handleDeleteCase = async (id: string) => {
     if (window.confirm('Are you sure you want to remove this case record?')) {
       const updated = cases.filter(c => c.id !== id && c.caseNumber !== id);
       saveCasesToStorage(updated);
-      triggerToast('Case record removed.');
+      try {
+        await fetch(getApiUrl(`/api/cases/${id}`), { method: 'DELETE' });
+      } catch (e) {
+        console.error(e);
+      }
+      triggerToast('Case record removed & deleted from MongoDB Atlas!');
     }
   };
 
@@ -986,7 +1030,7 @@ export const AdvocatePortalPage: React.FC = () => {
                   required
                   value={loginUserId}
                   onChange={(e) => setLoginUserId(e.target.value)}
-                  placeholder="Apna User ID ya Mobile no. likhein"
+                  placeholder="Enter User ID or Registered Mobile No."
                   className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-[#c5a059]"
                 />
               </div>
@@ -1001,7 +1045,7 @@ export const AdvocatePortalPage: React.FC = () => {
                     required
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Apna Password likhein"
+                    placeholder="Enter Confidential Password"
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-[#c5a059] pr-12"
                   />
                   <button
@@ -1363,8 +1407,121 @@ export const AdvocatePortalPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab Navigation Navigation Bar */}
-        <div className="flex border-b border-slate-200 bg-white shadow-sm overflow-x-auto">
+        {/* Mobile / Tablet Section Navigation (No Horizontal Scrolling Required!) */}
+        <div className="block lg:hidden space-y-3 bg-white p-4 border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1e293b] flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-[#c5a059]" /> Select Chamber Section:
+            </span>
+            <span className="text-[10px] font-bold text-[#c5a059] bg-[#1e293b] px-2 py-0.5 rounded">
+              {activeTab === 'cases' && `Cases (${cases.length})`}
+              {activeTab === 'clients' && `Clients (${clientsList.length})`}
+              {activeTab === 'profile' && `Profile Settings`}
+              {activeTab === 'heroSlides' && `Hero Slider`}
+              {activeTab === 'locations' && `Chambers (${locationsList.length})`}
+              {activeTab === 'blogs' && `Blogs (${blogsList.length})`}
+              {activeTab === 'caseStudies' && `Case Studies`}
+              {activeTab === 'enquiries' && `Queries (${enquiries.length})`}
+              {activeTab === 'addCase' && `File New Case`}
+            </span>
+          </div>
+
+          {/* Quick Section Dropdown */}
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full py-3 px-4 bg-[#1e293b] text-white font-bold text-xs uppercase border-2 border-[#c5a059] shadow-md focus:outline-none cursor-pointer"
+          >
+            <option value="cases">📂 Manage Cases & Court Orders ({cases.length})</option>
+            <option value="clients">👥 Client Directory ({clientsList.length})</option>
+            <option value="profile">⚙️ Advocate Profile, Phone & Email</option>
+            <option value="heroSlides">🖼️ Hero Slider (4 Uploaded Photos)</option>
+            <option value="locations">📍 Chamber Locations & Google Maps ({locationsList.length})</option>
+            <option value="blogs">📝 Legal Blogs & Updates ({blogsList.length})</option>
+            <option value="caseStudies">🏛️ Case Study Gallery ({caseStudiesList.length})</option>
+            <option value="enquiries">✉️ Received Client Queries ({enquiries.length})</option>
+            <option value="addCase">➕ File New Case Record</option>
+          </select>
+
+          {/* 2 or 3 Column Compact Grid for Immediate 1-Tap Access */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1">
+            <button
+              onClick={() => setActiveTab('cases')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'cases' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              📂 Cases ({cases.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('clients')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'clients' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              👥 Clients ({clientsList.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('enquiries')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'enquiries' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              ✉️ Queries ({enquiries.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'profile' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              ⚙️ Profile
+            </button>
+            <button
+              onClick={() => setActiveTab('heroSlides')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'heroSlides' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              🖼️ Hero Slides
+            </button>
+            <button
+              onClick={() => setActiveTab('locations')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'locations' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              📍 Chambers
+            </button>
+            <button
+              onClick={() => setActiveTab('blogs')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'blogs' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              📝 Articles
+            </button>
+            <button
+              onClick={() => setActiveTab('caseStudies')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                activeTab === 'caseStudies' ? 'bg-[#c5a059] text-white border-[#c5a059] shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              🏛️ Precedents
+            </button>
+            <button
+              onClick={() => setActiveTab('addCase')}
+              className={`p-2.5 text-center text-[11px] font-bold uppercase tracking-tight border col-span-2 sm:col-span-1 transition-all ${
+                activeTab === 'addCase' ? 'bg-[#1e293b] text-[#c5a059] border-[#1e293b] shadow-sm' : 'bg-slate-900 text-white border-slate-800 hover:bg-black'
+              }`}
+            >
+              ➕ File New Case
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop Section Tab Bar (Visible on lg screens and above) */}
+        <div className="hidden lg:flex border-b border-slate-200 bg-white shadow-sm overflow-x-auto">
           <button
             onClick={() => setActiveTab('cases')}
             className={`px-5 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer shrink-0 ${
@@ -3224,7 +3381,7 @@ export const AdvocatePortalPage: React.FC = () => {
                     <p className="bg-white p-3 border mt-2"><strong>Client Message:</strong> {enq.message}</p>
                   </div>
 
-                  <div className="pt-2 flex items-center gap-3">
+                  <div className="pt-2 flex items-center justify-between gap-3">
                     <a
                       href={`tel:${enq.phone}`}
                       className="px-4 py-2 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider hover:bg-slate-800 flex items-center gap-1.5"
@@ -3232,6 +3389,16 @@ export const AdvocatePortalPage: React.FC = () => {
                       <Phone className="w-3.5 h-3.5 text-[#c5a059]" />
                       <span>Call Client Directly</span>
                     </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEnquiry(enq.id || enq.phone)}
+                      className="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
+                      title="Delete this client query"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete Query</span>
+                    </button>
                   </div>
                 </div>
               ))}
